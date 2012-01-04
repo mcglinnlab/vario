@@ -1,7 +1,20 @@
-/* x is a sitexsp matrix (sp as columns) of real numbers
-   n is number of sites (i.e. rows)
-   s is number of species (i.e. columns)
-   pos and neg are lists of zeros the length of the unique pairwise combinations of species and site 
+/*
+   Author: Dan McGlinn
+   Email: danmcglinn@gmail.com
+   Purpose: To compute the positive and negative fractions of covariance between
+   the columns (i.e., species) of a matrix   
+   Arguments: 
+     x: is a one dimensional representation of a sitexsp matrix (sp as columns) 
+        of real numbers, unsampled rows (i.e. sites) have value -99999
+     n: is number of sites (i.e. rows)
+     s: is number of species (i.e. columns)
+     pos: a list of zeros the length of the unique pairwise combinations of
+          species and site 
+     neg: a list of zeros the length of the unique pairwise combinations of
+          species and site 
+   Output: 
+     pos: vector of positive covariances
+     neg: vector of negative covariances
 */
 
 #include <R.h>
@@ -11,8 +24,11 @@ void loopcovreal(double *x, int *n, int *s, double *pos, double *neg){
  double d ;
  icount = 0 ; 
  for (i = 0; i < (*n-1); i++) { /*loop through sites */
-  while(x[i] < -99998) /* assuming that if the first species is -99999 (i.e. unsampled) that all the rest are as well */
+  while(x[i] < -99998) 
    i++ ;
+   /* the above while loop assumes that if the first species is -99999
+      (i.e. unsampled) that all the rest of the species are unsampled as well 
+   */
   for (j = (i+1); j < *n; j++) {  
    while(x[j] < -99998)
     j++ ;
