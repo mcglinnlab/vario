@@ -47,7 +47,8 @@ site.rand = function(mat){
 
 
 ##1.91##
-estimateD = function(z){
+'estimateD' = function(z)
+{
  ##esimates the fractal dimension D from a 2-dimensional grid
  ##z is a matrix of real numbers
  n = dim(z)[1]
@@ -62,20 +63,25 @@ estimateD = function(z){
 #####Part II - FUNCTIONS FOR Spatial Permutations #####
 
 ##2.1##
-spatPerm2D = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE){
-  ##Purpose: to permute an array of occurances under a given set of constraints
-  ##in 2-dimensions of space
-  ##Arguments:
-  ##psp is the sp x row x col array, where rows and columns specify where on the spatial grid the sample was located
-  ##shiftpos: two numbers that are the x and y places to shift the grid, this is generated randomly if needed
-  ##rotate: a single number 1-4 that indicates how many counterclockwise rotations to perform, generated randomly
-  ##meth the type of permutation to use, options include:
-  ###"reflect": random reflection/rotations of species (only makes sence when sp are not fixed
-  ###"shift": random torodial shifting with or with sp fixed
-  ###"both": both reflection and shifting
-  ###"random": random shuffle
-  ##if 'sp' is FALSE then obs composition of quadrats is fixed to the observed pattern
-  ##if 'sp' is TRUE then species are each shuffled independently
+'spatPerm2D' = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE)
+{
+  ## Purpose: to permute an array of occurances under a given set of constraints
+  ## in 2-dimensions of space
+  ## Arguments:
+  ## psp: the sp x row x col array, where rows and columns specify where on
+  ##      the spatial grid the sample was located
+  ## shiftpos: two numbers that are the x and y places to shift the grid, this
+  ##           is generated randomly if needed
+  ## rotate: a single number 1-4 that indicates how many counterclockwise
+  ##         rotations to perform, generated randomly
+  ## meth: the type of permutation to use, options include:
+  ##   reflect: random reflection/rotations of species (only makes sence when
+  ##              sp are not fixed
+  ##   shift: random torodial shifting with or with sp fixed
+  ##   both: both reflection and shifting
+  ##   random: random shuffle
+  ## sp: if FALSE then obs composition of quadrats is fixed to the observed pattern
+  ##     if TRUE then species are each shuffled independently
   n = dim(psp)[2]
   if(length(dim(psp)) == 3){
     S = dim(psp)[1]
@@ -223,11 +229,11 @@ spatPerm2D = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE){
         } } }
         if(sample(2,size=1) == 1)  ## equivalent to a coin flip, if 1 then reflect and shift
           Rpsp[,n:1,n:1] = psp[,ncoord.x,ncoord.y]
-        else ##just shift
+        else  ## just shift
           Rpsp = psp[,ncoord.x,ncoord.y]
     } }
-    else{#meth is random and sp columns are fixed
-      take = sample(n^2) #sample w/o replacement
+    else{  ## meth is random and sp columns are fixed
+      take = sample(n^2)  ## sample w/o replacement
       for(j in 1:S){
         Rpsp[j,,] = matrix(psp[j,,][take],ncol=n,nrow=n)
   } } }
@@ -237,21 +243,29 @@ spatPerm2D = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE){
 }
 
 ##2.2##
-spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE,nstrata=1){
-  ##Purpose: to permute an array of occurances under a given set of constraints in 2-dimensions of space
-  ##with defined spatial strata, see 'nstrata' argument below
-  ##Arguments:
-  ##psp is the sp x row x col array, where rows and columns specify where on the spatial grid the sample was located
-  ##shiftpos: two numbers that are the x and y places to shift the grid, this is generated randomly if needed
-  ##rotate: a single number 1-4 that indicates how many counterclockwise rotations to perform, generated randomly
-  ##meth the type of permutation to use, options include:
-  ###"reflect": random reflection/rotations of species (only makes sence when sp are not fixed
-  ###"shift": random torodial shifting with or with sp fixed
-  ###"both": both reflection and shifting
-  ###"random": random shuffle
-  ##if 'sp' is FALSE then obs composition of quadrats is fixed to the observed pattern
-  ##if 'sp' is TRUE then species are each shuffled independently
-  ##'nstrata' is the number of strata along a single spatial axis within which to randomize
+'spatPermStrata' = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',
+                            sp=FALSE,nstrata=1)
+{
+  ## Purpose: to permute an array of occurances under a given set of constraints
+  ## in 2-dimensions of spacewith defined spatial strata, see 'nstrata'
+  ## argument below
+  ## Arguments:
+  ## psp: the sp x row x col array, where rows and columns specify where on
+  ##      the spatial grid the sample was located
+  ## shiftpos: two numbers that are the x and y places to shift the grid, this
+  ##           is generated randomly if needed
+  ## rotate: a single number 1-4 that indicates how many counterclockwise
+  ##         rotations to perform, generated randomly
+  ## meth: the type of permutation to use, options include:
+  ##   reflect: random reflection/rotations of species (only makes sence when
+  ##              sp are not fixed
+  ##   shift: random torodial shifting with or with sp fixed
+  ##   both: both reflection and shifting
+  ##   random: random shuffle
+  ## sp: if FALSE then obs composition of quadrats is fixed to the observed pattern
+  ##     if TRUE then species are each shuffled independently
+  ## nstrata: is the number of strata along a single spatial axis within which
+  ##          to randomize
   n = dim(psp)[2]
   if(length(dim(psp)) == 3){
     S = dim(psp)[1]
@@ -263,8 +277,10 @@ spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE,ns
     flag = TRUE
   }
   strata.size = n/nstrata
-  if(round(strata.size) != strata.size)
-    stop('Number of strata must be evenly divisable by the linear dimension of the grid')
+  if(round(strata.size) != strata.size){
+    stop('Number of strata must be evenly divisable by the linear dimension
+          of the grid')
+  }
   ## now simply apply the function spatPerm2D on subsets of the orginal matrix
   ## and append all the pieces together at end
   Rpsp = psp
@@ -273,7 +289,8 @@ spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE,ns
     sub.i = brks[i]:(brks[i]+strata.size-1)
     for(j in 1:nstrata){
       sub.j = brks[j]:(brks[j]+strata.size-1)
-      Rpsp[,sub.i,sub.j] = spatPerm2D(psp[,sub.i,sub.j],meth=meth,sp=sp,shiftpos=shiftpos,rotate=rotate)
+      Rpsp[,sub.i,sub.j] = spatPerm2D(psp[,sub.i,sub.j],meth=meth,sp=sp,
+                                      shiftpos=shiftpos,rotate=rotate)
   } }
   if(flag)
     Rpsp = drop(Rpsp)
@@ -282,102 +299,113 @@ spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE,ns
 
 
 ##2.3##
-RandPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,alpha=0.01){
- ##Purpose: to be called in serial or parallel by function "RandPatPar"
- ##this function evaulates the .C function 'randpatpar' which is the random patterns algo of
- ##Roxburgh and Chesson 1998. Returns species index, phi stat, number of actual swaps, and the 
- ##randomized presences as a single vector of numbers
- ##Arguments:
- ##i: the ith species index
- ##psp: multidimenstional S x (n+2) x (n+2) array
- ##rpsp: a randomized version of psp
- ##n: the size of the orginal 2-D array along one spatial axis (i.e., without extra rows and columns)
- ##pl: the places in rpsp that can be swaped
- ##mtrials1: the number of times to attempt a swap at the strata level
- ##mtrials2: the number of times to attempt a swap at the pixel level
- ##alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
- ###################################################
- psp = psp[i,,]
- rpsp = rpsp[i,,]
- n2 = n+2
- ##PART I##
- ##begin permuting the blocks defined by nstrata
- rpsp.tmp = rpsp[-c(1,n2),-c(1,n2)]
- coords = cbind(rep(1:nstrata,nstrata),rep(1:nstrata,each=nstrata))
- rcoords = coords[sample(nstrata^2),]
- for(j in 1:nstrata^2){
-  rows = ((coords[j,1]-1)*n/nstrata+1) : ((coords[j,1]-1)*n/nstrata+n/nstrata)
-  cols = ((coords[j,2]-1)*n/nstrata+1) : ((coords[j,2]-1)*n/nstrata+n/nstrata)
-  rrows = ((rcoords[j,1]-1)*n/nstrata+1) : ((rcoords[j,1]-1)*n/nstrata+n/nstrata)
-  rcols = ((rcoords[j,2]-1)*n/nstrata+1) : ((rcoords[j,2]-1)*n/nstrata+n/nstrata)
-  rpsp[-c(1,n2),-c(1,n2)][rows,cols] = rpsp.tmp[rrows,rcols]
- }
- rpsp = FixUnSamp(psp,rpsp)
- ostat = .C("spatstat",as.double(as.vector(psp)),as.integer(n),as.double(rep(0,4)))[[3]]
- nstat = .C("spatstat",as.double(as.vector(rpsp)),as.integer(n),as.double(rep(0,4)))[[3]]
- phi = .C("calcphi",as.double(nstat),as.double(ostat),as.double(0))[[3]]
- ##now begin random swapping of blocks defined by strata 
- ntrials = 0 ; gtrials = 0
- rpsp.tmp1 = rpsp
- while(phi > alpha & ntrials < mtrials1){
-  rpsp.tmp2 = rpsp.tmp1[-c(1,n2),-c(1,n2)]
-  rcoords = coords[sample(nstrata^2,2),]
-  startrows = ((rcoords[1,1]-1)*n/nstrata+1) : ((rcoords[1,1]-1)*n/nstrata+n/nstrata)
-  startcols = ((rcoords[1,2]-1)*n/nstrata+1) : ((rcoords[1,2]-1)*n/nstrata+n/nstrata)
-  endrows = ((rcoords[2,1]-1)*n/nstrata+1) : ((rcoords[2,1]-1)*n/nstrata+n/nstrata)
-  endcols = ((rcoords[2,2]-1)*n/nstrata+1) : ((rcoords[2,2]-1)*n/nstrata+n/nstrata)
-  rpsp.tmp1[-c(1,n2),-c(1,n2)][startrows,startcols] = rpsp.tmp2[endrows,endcols]
-  rpsp.tmp1[-c(1,n2),-c(1,n2)][endrows,endcols] = rpsp.tmp2[startrows,startcols]
-  rpsp.tmp1 = FixUnSamp(psp,rpsp.tmp1)
-  nstat = .C("spatstat",as.double(as.vector(rpsp.tmp1)),as.integer(n),as.double(rep(0,4)))[[3]]
-  phiTemp = .C("calcphi",as.double(nstat),as.double(ostat),as.double(0))[[3]]
-  if(phiTemp < phi){
-   phi = phiTemp
-   gtrials = gtrials +1
-   ##make change permanent
-   rpsp = rpsp.tmp1
+'randPat' = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
+                     alpha=0.01)
+{
+  ## Purpose: to be called in serial or parallel by function "randPatPar'
+  ## this function evaulates the .C function 'randpatpar' which is the random patterns algo of
+  ## Roxburgh and Chesson 1998. Returns species index, phi stat, number of actual swaps, and the 
+  ## randomized presences as a single vector of numbers
+  ## Arguments:
+  ## i: the ith species index
+  ## psp: multidimenstional S x (n+2) x (n+2) array
+  ## rpsp: a randomized version of psp
+  ## n: the size of the orginal 2-D array along one spatial axis (i.e., without extra rows and columns)
+  ## pl: the places in rpsp that can be swaped
+  ## mtrials1: the number of times to attempt a swap at the strata level
+  ## mtrials2: the number of times to attempt a swap at the pixel level
+  ## alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
+  psp = psp[i,,]
+  rpsp = rpsp[i,,]
+  n2 = n+2
+  ## PART I
+  ## begin permuting the blocks defined by nstrata
+  rpsp.tmp = rpsp[-c(1,n2),-c(1,n2)]
+  coords = cbind(rep(1:nstrata,nstrata),rep(1:nstrata,each=nstrata))
+  rcoords = coords[sample(nstrata^2),]
+  for(j in 1:nstrata^2){
+    rows = ((coords[j,1]-1)*n/nstrata+1) : ((coords[j,1]-1)*n/nstrata+n/nstrata)
+    cols = ((coords[j,2]-1)*n/nstrata+1) : ((coords[j,2]-1)*n/nstrata+n/nstrata)
+    rrows = ((rcoords[j,1]-1)*n/nstrata+1) : ((rcoords[j,1]-1)*n/nstrata+n/nstrata)
+    rcols = ((rcoords[j,2]-1)*n/nstrata+1) : ((rcoords[j,2]-1)*n/nstrata+n/nstrata)
+    rpsp[-c(1,n2),-c(1,n2)][rows,cols] = rpsp.tmp[rrows,rcols]
   }
-  else{
-   ##start back with orginal random mat
-   rpsp.tmp1 = rpsp
+  rpsp = fixUnSamp(psp,rpsp)
+  ostat = .C('spatstat',as.double(as.vector(psp)),as.integer(n),
+             as.double(rep(0,4)))[[3]]
+  nstat = .C('spatstat',as.double(as.vector(rpsp)),as.integer(n),
+             as.double(rep(0,4)))[[3]]
+  phi = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0))[[3]]
+  ## now begin random swapping of blocks defined by strata 
+  ntrials = 0 ; gtrials = 0
+  rpsp.tmp1 = rpsp
+  while(phi > alpha & ntrials < mtrials1){
+    rpsp.tmp2 = rpsp.tmp1[-c(1,n2),-c(1,n2)]
+    rcoords = coords[sample(nstrata^2,2),]
+    startrows = ((rcoords[1,1]-1)*n/nstrata+1) : 
+                ((rcoords[1,1]-1)*n/nstrata+n/nstrata)
+    startcols = ((rcoords[1,2]-1)*n/nstrata+1) : 
+                ((rcoords[1,2]-1)*n/nstrata+n/nstrata)
+    endrows = ((rcoords[2,1]-1)*n/nstrata+1) : 
+              ((rcoords[2,1]-1)*n/nstrata+n/nstrata)
+    endcols = ((rcoords[2,2]-1)*n/nstrata+1) : 
+              ((rcoords[2,2]-1)*n/nstrata+n/nstrata)
+    rpsp.tmp1[-c(1,n2),-c(1,n2)][startrows,startcols] = rpsp.tmp2[endrows,endcols]
+    rpsp.tmp1[-c(1,n2),-c(1,n2)][endrows,endcols] = rpsp.tmp2[startrows,startcols]
+    rpsp.tmp1 = fixUnSamp(psp,rpsp.tmp1)
+    nstat = .C('spatstat',as.double(as.vector(rpsp.tmp1)),as.integer(n),
+               as.double(rep(0,4)))[[3]]
+    phiTemp = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0))[[3]]
+    if(phiTemp < phi){
+      phi = phiTemp
+      gtrials = gtrials +1
+      ## make change permanent
+      rpsp = rpsp.tmp1
+    }
+    else{
+      ## start back with orginal random mat
+      rpsp.tmp1 = rpsp
+    }
+    ntrials = ntrials+1
+  } 
+  if(phi > alpha & mtrials2>0){
+    ## Part II
+    ## carry out individual pixel swapping
+    psp = as.vector(psp)
+    rpsp = as.vector(rpsp)
+    tmp = .C('randpatpar',psp = as.double(psp),
+             rpsp = as.double(rpsp), n = as.integer(n),
+             ostat = as.double(rep(0,4)), nstat = as.double(rep(0,4)), 
+             phi = as.double(0), phiTemp = as.double(0),
+             alpha = as.double(alpha), pl = as.integer(pl-1),
+             nplaces = as.integer(length(pl)-1),ntrials = as.double(0),
+             gtrials = as.double(0), mtrials = as.double(mtrials2))
+    out = c(i,phi,gtrials,tmp$phi,tmp$gtrials,tmp$rpsp)
   }
-  ntrials = ntrials+1
- } 
- if(phi > alpha & mtrials2>0){
-  ##Part II##
-  ##carry out individual pixel swapping
-  psp = as.vector(psp)
-  rpsp = as.vector(rpsp)
-  tmp = .C("randpatpar",psp = as.double(psp),
-        rpsp = as.double(rpsp), n = as.integer(n),
-         ostat = as.double(rep(0,4)), nstat = as.double(rep(0,4)), 
-         phi = as.double(0), phiTemp = as.double(0),
-         alpha = as.double(alpha), pl = as.integer(pl-1),
-         nplaces = as.integer(length(pl)-1),ntrials = as.double(0),
-         gtrials = as.double(0), mtrials = as.double(mtrials2))
-  out = c(i,phi,gtrials,tmp$phi,tmp$gtrials,tmp$rpsp)
- }
- else
-  out = c(i,phi,gtrials,NA,NA,as.vector(rpsp))
- out
+  else
+    out = c(i,phi,gtrials,NA,NA,as.vector(rpsp))
+  return(out)
 }
 
 ##2.4##
-RandPatPar = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1){
- ##Purpose: convience function for working with RandPat which calls the .C function
- ##'randpatpar'. This function allows you to specify the number of processors to run on
- ##adding processsors only helps if working with many species as each species is evaulated
- ##on a different processor. Returns a (5+(n+2)^2) x S matrix, the first five rows of which 
- ##are species index, phi strata stat, number of strata swaps, phi pixel swap, and number of 
- ##pixel swaps, and then the remaining rows are the presences/abundances in the randomized occurances
- ##Arguments:
- ##psp: multidimenstional S x (n+2) x (n+2) array
- ##n: the size of the orginal 2-D array along one spatial axis (i.e., without extra rows and columns)
- ##pl: the places in rpsp that can be swaped
- ##mtrials: the numbef of times to attempt a swap
- ##alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
- ##npar: the number of processors to run the code on
- ###################################################
+'randPatPar' = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1)
+{
+ ## Purpose: convience function for working with randPat which calls the .C
+ ## function 'randpatpar'. This function allows you to specify the number of
+ ## processors to run on adding processsors only helps if working with many
+ ## species as each species is evaulated on a different processor. Returns a 
+ ## (5+(n+2)^2) x S matrix, the first five rows of which are species index, phi
+ ## strata stat, number of strata swaps, phi pixel swap, and number of pixel
+ ## swaps, and then the remaining rows are the presences/abundances in the
+ ## randomized occurances
+ ## Arguments:
+ ## psp: multidimenstional S x (n+2) x (n+2) array
+ ## n: the size of the orginal 2-D array along one spatial axis (i.e., without
+ ##    extra rows and columns)
+ ## pl: the places in rpsp that can be swaped
+ ## mtrials: the numbef of times to attempt a swap
+ ## alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
+ ## npar: the number of processors to run the code on
  n = dim(psp)[2]
  if(length(dim(psp)) == 3)
   S = dim(psp)[1]
@@ -385,20 +413,19 @@ RandPatPar = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1){
   S = 1
   psp = array(psp,dim=c(S,n,n))
  }
- ####first prepare psp for the randomization process####
- ##fill in empty pixels with -999##
- #sampled = rep(ifelse(apply(psp,c(2,3),sum)>0,0,-999),each=S)
- #dim(sampled) = c(S,n,n) 
- #psp = psp + sampled
- ##add border of -999###
+ ## first prepare psp for the randomization process
+ ## add border of -999
  n2 = n+2
- psp.temp =  array(0,dim=c(S,n2,n2)) ##create an array with boundary cells
- psp.temp[,-c(1,n2),-c(1,n2)] = psp ##populate the array with the input data
- psp.temp[,1,-c(1,n2)] = -999 ##x of 0
- psp.temp[,n2,-c(1,n2)] = -999 ##x of n+1
- psp.temp[,-c(1,n2),1] = -999##y of 0
- psp.temp[,-c(1,n2),n2] = -999 ##y of n+1
- psp.temp[,1,1] = -999 ;  psp.temp[,1,n2] = -999 ;  psp.temp[,n2,1] = -999 ;  psp.temp[,n2,n2] = -999
+ psp.temp =  array(0,dim=c(S,n2,n2))  ## create an array with boundary cells
+ psp.temp[,-c(1,n2),-c(1,n2)] = psp  ## populate the array with the input data
+ psp.temp[,1,-c(1,n2)] = -999  ## x of 0
+ psp.temp[,n2,-c(1,n2)] = -999  ## x of n+1
+ psp.temp[,-c(1,n2),1] = -999  ## y of 0
+ psp.temp[,-c(1,n2),n2] = -999  ## y of n+1
+ psp.temp[,1,1] = -999
+ psp.temp[,1,n2] = -999
+ psp.temp[,n2,1] = -999
+ psp.temp[,n2,n2] = -999
  psp = psp.temp
  pl = 1:n2^2
  c1 = NA
@@ -408,45 +435,49 @@ RandPatPar = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1){
  ##now read to begin intital randomization
  rpsp = psp
  ##inital reflection/rotation for each species independently
- rpsp[,-c(1,n2),-c(1,n2)] = spatPermStrata(psp[,-c(1,n2),-c(1,n2)],meth='reflect',sp=TRUE,nstrata=nstrata)
+ rpsp[,-c(1,n2),-c(1,n2)] = spatPermStrata(psp[,-c(1,n2),-c(1,n2)],meth='reflect',
+                                           sp=TRUE,nstrata=nstrata)
  nplaces = length(pl)
  nswaps = (nplaces*(nplaces-1))/2
  if(npar>1){
   require(snowfall)
-  sfInit(parallel=TRUE, cpus=npar, type="SOCK")
+  sfInit(parallel=TRUE, cpus=npar, type='SOCK')
   sfClusterSetupRNG()
-  sfExport("RandPat", "FixUnSamp", "psp", "rpsp","n","nstrata","pl","mtrials1","mtrials2","alpha")
-  sfClusterEval(dyn.load("randompatternspar.dll"))
-  out = unlist(sfSapply(1:S,function(i)
-    RandPat(i=i,psp=psp,rpsp=rpsp,n=n,nstrata=nstrata,pl=pl,mtrials1=mtrials1,mtrials2=mtrials2,alpha=alpha)))
+  sfExport('randPat', 'fixUnSamp', 'psp', 'rpsp','n','nstrata','pl','mtrials1',
+           'mtrials2','alpha')
+  sfClusterEval(dyn.load('randompatternspar.dll'))
+  out = unlist(sfSapply(1:S,function(i){
+    randPat(i=i,psp=psp,rpsp=rpsp,n=n,nstrata=nstrata,pl=pl,mtrials1=mtrials1,
+            mtrials2=mtrials2,alpha=alpha)}))
   sfStop()
  }
  else{
   out = NULL
   for(i in 1:S)
-   out = cbind(out,RandPat(i=i,psp=psp,rpsp=rpsp,n=n,nstrata=nstrata,pl=pl,mtrials1=mtrials1,mtrials2=mtrials2,alpha=alpha))
+   out = cbind(out,randPat(i=i,psp=psp,rpsp=rpsp,n=n,nstrata=nstrata,pl=pl,
+                           mtrials1=mtrials1,mtrials2=mtrials2,alpha=alpha))
  }
- out
+ return(out)
 }
 
 ##2.5##
-FixUnSamp = function(oarray,rarray){
- ##purpose: to maintain the spatial locations
- ##of the unsampled pixels in rarray which is a random
- ##realization of oarray, -999 is the identifier for 
- ##unsampled cells, in this case oarray and rarray DO have a false border of -999
+'fixUnSamp' = function(oarray,rarray)
+{
+ ## Purpose: to maintain the spatial locations of the unsampled pixels in
+ ## rarray which is a random realization of oarray, -999 is the identifier for 
+ ## unsampled cells, in this case oarray and rarray DO have a false border of -999
  rarray.tmp = rarray
- if(length(dim(oarray)) == 3){ ##if multiple species then
+ if(length(dim(oarray)) == 3){ ## if multiple species then
   n2 = dim(oarray)[2]
-  if(-999%in%oarray[1,-c(1,n2),-c(1,n2)]){ ##if there are unsampled pixels in the data, then
+  if(-999 %in% oarray[1,-c(1,n2),-c(1,n2)]){ ## if there are unsampled pixels in the data, then
    S = dim(oarray)[1]
    o.na = oarray == -999
    r.na = rarray == -999
-   end.tmp = which(o.na[1,-c(1,n2),-c(1,n2)]) ##identifies where in o.na it is -999
+   end.tmp = which(o.na[1,-c(1,n2),-c(1,n2)])  ## identifies where in o.na it is -999
    for(i in 1:S){
-    start.tmp = which(r.na[i,-c(1,n2),-c(1,n2)])##identifies where in r.na it is -999
-    if(sum(which(!is.na(match(end.tmp,start.tmp))))>0){
-     ##drop ones in which end.tmp and start.tmp match
+    start.tmp = which(r.na[i,-c(1,n2),-c(1,n2)])  ## identifies where in r.na it is -999
+    if(sum(which(!is.na(match(end.tmp,start.tmp)))) > 0){
+     ## drop ones in which end.tmp and start.tmp match
      end = end.tmp[-which(!is.na(match(end.tmp,start.tmp)))]
      start = start.tmp[-which(!is.na(match(start.tmp,end.tmp)))]
     }
@@ -457,15 +488,15 @@ FixUnSamp = function(oarray,rarray){
     rarray[i,-c(1,n2),-c(1,n2)][end] =  rarray.tmp[i,-c(1,n2),-c(1,n2)][start]
     rarray[i,-c(1,n2),-c(1,n2)][start] =  rarray.tmp[i,-c(1,n2),-c(1,n2)][end]
  }}}
- else{ ##only a single species
+ else{  ## only a single species
   n2 = dim(oarray)[1]
-  if(-999%in%oarray[-c(1,n2),-c(1,n2)]){ ##if there are unsampled pixels in the data, then
+  if(-999 %in% oarray[-c(1,n2),-c(1,n2)]){  ## if there are unsampled pixels in the data, then
    o.na = oarray == -999
    r.na = rarray == -999
-   end.tmp = which(o.na[-c(1,n2),-c(1,n2)]) ##identifies where in o.na it is -999
-   start.tmp = which(r.na[-c(1,n2),-c(1,n2)])##identifies where in r.na it is -999
+   end.tmp = which(o.na[-c(1,n2),-c(1,n2)])  ## identifies where in o.na it is -999
+   start.tmp = which(r.na[-c(1,n2),-c(1,n2)])  ## identifies where in r.na it is -999
    if(sum(which(!is.na(match(end.tmp,start.tmp))))>0){
-    ##drop ones in which end.tmp and start.tmp match
+    ## drop ones in which end.tmp and start.tmp match
     end = end.tmp[-which(!is.na(match(end.tmp,start.tmp)))]
     start = start.tmp[-which(!is.na(match(start.tmp,end.tmp)))]
    }
@@ -476,11 +507,11 @@ FixUnSamp = function(oarray,rarray){
    rarray[-c(1,n2),-c(1,n2)][end] =  rarray.tmp[-c(1,n2),-c(1,n2)][start]
    rarray[-c(1,n2),-c(1,n2)][start] =  rarray.tmp[-c(1,n2),-c(1,n2)][end]
  }}
- rarray
+ return(rarray)
 }
 
 ##2.6##
-FixUnSamp2 = function(oarray,rarray){
+'fixUnSamp2' = function(oarray,rarray){
  ##purpose: to maintain the spatial locations
  ##of the unsampled pixels in rarray which is a random
  ##realization of oarray, -999 is the identifier for 
@@ -543,7 +574,7 @@ dist.cross.real = function(x){
  x = as.double(ifelse(is.na(x) | x == -999,-99999,x))
  pos = as.double(rep(0,(N*(N-1))/2))
  neg = as.double(rep(0,(N*(N-1))/2))
- result = .C("loopcovreal",x,N,S,pos,neg)
+ result = .C('loopcovreal',x,N,S,pos,neg)
  out = list()
  out$pos = result[[4]]
  out$neg = result[[5]]
@@ -552,9 +583,9 @@ dist.cross.real = function(x){
 
 ##3.2##
 vario = function(x,coord,grain=1,breaks=NA,hmax=NA,round.up=FALSE,pos.neg=FALSE,
-                binary=TRUE,snap=NA,median=FALSE,direction = "omnidirectional",
-                tolerance = pi/8, unit.angle = c("radians", "degrees"),
-                distance.metric = "euclidean"){
+                binary=TRUE,snap=NA,median=FALSE,direction = 'omnidirectional',
+                tolerance = pi/8, unit.angle = c('radians', 'degrees'),
+                distance.metric = 'euclidean'){
  ##Purpose: calculates uni- and multi-variate variograms
  ##Note: modified from 'vegan' function 'mso'
  ##Arguments:
@@ -579,13 +610,13 @@ vario = function(x,coord,grain=1,breaks=NA,hmax=NA,round.up=FALSE,pos.neg=FALSE,
  ##         directional variograms. The value must be in the interval [0,
  ##         pi/2] radians ([0, 90] degrees).  Defaults to pi/8.
  ##'unit.angle': defines the unit for the specification of angles in the two
- ##         previous arguments. Options are ?"radians"? and
- ##         ?"degrees"?, with default to ?"radians"?.
+ ##         previous arguments. Options are 'radians' and
+ ##         'degrees', with default to 'radians'.
  ####vegan arguments####
  ##'distance.metric': can be one of the speices turnover metrics listed by the 
  ##                   vegan function vegdist(). This is only appropriate if pos.neg = FALSE.
- ##                   common options include, "jaccard" and "bray". If computed on pres/abse
- ##                   data then soreson index is computed by "bray". 
+ ##                   common options include, 'jaccard' and 'bray'. If computed on pres/abse
+ ##                   data then soreson index is computed by 'bray". 
  ####################################################################################
  if(distance.metric != "euclidean"){
   if(pos.neg)
@@ -830,7 +861,7 @@ null.perms = function(x,vobject,nperm,coords=NULL,meth='both',sp=TRUE,all=FALSE,
  if(npar == 1){ ##all permutations option not yet implemented for 1 processor
   for(i in 1:nperm){
    if(RPargs[[1]]){ ##use the random pattern algo for the spatial null
-    out = RandPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
+    out = randPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
     S = dim(pop)[1]
     n2 = dim(pop)[2]+2
     r.vals$p.conv1 = r.vals$p.conv1 + sum(out[2,]<=RPargs[[5]])/S/nperm
@@ -843,7 +874,7 @@ null.perms = function(x,vobject,nperm,coords=NULL,meth='both',sp=TRUE,all=FALSE,
    }
    else{
     rpop = spatPerm2D(pop,meth=meth,sp=sp)
-    rpop = FixUnSamp2(pop,rpop)
+    rpop = fixUnSamp2(pop,rpop)
    }
    rmat = apply(rpop,1,as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
    rv = vario(x=rmat,coord=coords,grain=grain,hmax=hmax,pos.neg=pos.neg,median=median,
@@ -881,7 +912,7 @@ null.perms = function(x,vobject,nperm,coords=NULL,meth='both',sp=TRUE,all=FALSE,
   require(snowfall)
   sfInit(parallel=TRUE, cpus=npar, type="SOCK")
   sfClusterSetupRNG()
-  sfExport("pop", "vobject", "coords", "meth", "all", "sp", "RPargs", "RandPatPar", "RandPat", "FixUnSamp","FixUnSamp2", "spatPerm2D", "spatPermStrata", "vario", "dist.cross.real", "null.gen")
+  sfExport("pop", "vobject", "coords", "meth", "all", "sp", "RPargs", "randPatPar", "randPat", "fixUnSamp","fixUnSamp2", "spatPerm2D", "spatPermStrata", "vario", "dist.cross.real", "null.gen")
   if(linux)
    sfClusterEval(dyn.load("danspkg.so"))
   else{
@@ -950,7 +981,7 @@ null.gen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FAL
  ##"sp" = TRUE then species are each shuffled independently
  ##'all' if TRUE then all relevant nulls are calculated
  ##'RPargs' is a list of arguments that must be supplied if the random patterns algo is desired
- ###the arguments of RPargs are used input into the function 'RandPatPar', they include:
+ ###the arguments of RPargs are used input into the function 'randPatPar', they include:
  ###1)'allRP' if TRUE & 'all' = TRUE, then Random Patterns algo used as the spatial null
  ###2)'nstrata',3)'mtrials1',4)'mtrials2',5)'alpha',6)'npar'
  ##'median' if TRUE then means and medians are calculated
@@ -983,11 +1014,11 @@ null.gen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FAL
   for(j in 1:3){ #cycle through permutation methods
    if(j == 1){
     rpop = spatPerm2D(pop,meth='random',sp=TRUE)##random model
-    rpop = FixUnSamp2(pop,rpop)
+    rpop = fixUnSamp2(pop,rpop)
    }
    if(j == 2){
     if(RPargs[[1]]){ ##use the random pattern algo for the spatial null
-     out = RandPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
+     out = randPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
      rpop = array(0,dim=c(S,n2,n2))
      for(i in 1:S){
       rpop[i,,] = array(out[-(1:5),i],dim=c(n2,n2))
@@ -999,7 +1030,7 @@ null.gen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FAL
    }
    if(j == 3){
     rpop = spatPerm2D(pop,meth='random',sp=FALSE) ##species model
-    rpop = FixUnSamp2(pop,rpop)
+    rpop = fixUnSamp2(pop,rpop)
    }
    rmat = apply(rpop,1,as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
    rv = vario(x=rmat,coord=coords,grain=grain,hmax=hmax,pos.neg=pos.neg,median=median,
@@ -1015,7 +1046,7 @@ null.gen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FAL
  }}
  else{ ##not using every null model, only one null
   if(RPargs[[1]]){ ##use the random pattern algo for the spatial null
-   out = RandPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
+   out = randPatPar(psp=pop,nstrata=RPargs[[2]],mtrials1=RPargs[[3]],mtrials2=RPargs[[4]],alpha=RPargs[[5]],npar=RPargs[[6]])
    rpop = array(0,dim=c(S,n2,n2))
    for(i in 1:S){
     rpop[i,,] = array(out[-(1:5),i],dim=c(n+2,n+2))
@@ -1024,7 +1055,7 @@ null.gen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FAL
   } 
   else{
    rpop = spatPerm2D(pop,meth=meth,sp=sp)
-   rpop = FixUnSamp2(pop,rpop)
+   rpop = fixUnSamp2(pop,rpop)
   }
   rmat = apply(rpop,1,as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
   rv = vario(x=rmat,coord=coords,grain=grain,hmax=hmax,pos.neg=pos.neg,median=median,
