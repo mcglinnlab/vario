@@ -1,5 +1,5 @@
-\name{RandPat}
-\alias{RandPat}
+\name{randPat}
+\alias{randPat}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-RandPat(i, psp, rpsp, n, nstrata, pl, mtrials1 = 1000, mtrials2 = 1e+06, alpha = 0.01)
+randPat(i, psp, rpsp, n, nstrata, pl, mtrials1 = 1000, mtrials2 = 1e+06, alpha = 0.01)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -74,78 +74,77 @@ RandPat(i, psp, rpsp, n, nstrata, pl, mtrials1 = 1000, mtrials2 = 1e+06, alpha =
 function (i, psp, rpsp, n, nstrata, pl, mtrials1 = 1000, mtrials2 = 1e+06, 
     alpha = 0.01) 
 {
-    psp <- psp[i, , ]
-    rpsp <- rpsp[i, , ]
-    n2 <- n + 2
-    rpsp.tmp <- rpsp[-c(1, n2), -c(1, n2)]
-    coords <- cbind(rep(1:nstrata, nstrata), rep(1:nstrata, each = nstrata))
-    rcoords <- coords[sample(nstrata^2), ]
+    psp = psp[i, , ]
+    rpsp = rpsp[i, , ]
+    n2 = n + 2
+    rpsp.tmp = rpsp[-c(1, n2), -c(1, n2)]
+    coords = cbind(rep(1:nstrata, nstrata), rep(1:nstrata, each = nstrata))
+    rcoords = coords[sample(nstrata^2), ]
     for (j in 1:nstrata^2) {
-        rows <- ((coords[j, 1] - 1) * n/nstrata + 1):((coords[j, 
+        rows = ((coords[j, 1] - 1) * n/nstrata + 1):((coords[j, 
             1] - 1) * n/nstrata + n/nstrata)
-        cols <- ((coords[j, 2] - 1) * n/nstrata + 1):((coords[j, 
+        cols = ((coords[j, 2] - 1) * n/nstrata + 1):((coords[j, 
             2] - 1) * n/nstrata + n/nstrata)
-        rrows <- ((rcoords[j, 1] - 1) * n/nstrata + 1):((rcoords[j, 
+        rrows = ((rcoords[j, 1] - 1) * n/nstrata + 1):((rcoords[j, 
             1] - 1) * n/nstrata + n/nstrata)
-        rcols <- ((rcoords[j, 2] - 1) * n/nstrata + 1):((rcoords[j, 
+        rcols = ((rcoords[j, 2] - 1) * n/nstrata + 1):((rcoords[j, 
             2] - 1) * n/nstrata + n/nstrata)
-        rpsp[-c(1, n2), -c(1, n2)][rows, cols] <- rpsp.tmp[rrows, 
+        rpsp[-c(1, n2), -c(1, n2)][rows, cols] = rpsp.tmp[rrows, 
             rcols]
     }
-    rpsp <- FixUnSamp(psp, rpsp)
-    ostat <- .C("spatstat", as.double(as.vector(psp)), as.integer(n), 
+    rpsp = fixUnSampFalseBorder(psp, rpsp)
+    ostat = .C("spatstat", as.double(as.vector(psp)), as.integer(n), 
         as.double(rep(0, 4)))[[3]]
-    nstat <- .C("spatstat", as.double(as.vector(rpsp)), as.integer(n), 
+    nstat = .C("spatstat", as.double(as.vector(rpsp)), as.integer(n), 
         as.double(rep(0, 4)))[[3]]
-    phi <- .C("calcphi", as.double(nstat), as.double(ostat), 
-        as.double(0))[[3]]
-    ntrials <- 0
-    gtrials <- 0
-    rpsp.tmp1 <- rpsp
+    phi = .C("calcphi", as.double(nstat), as.double(ostat), as.double(0))[[3]]
+    ntrials = 0
+    gtrials = 0
+    rpsp.tmp1 = rpsp
     while (phi > alpha & ntrials < mtrials1) {
-        rpsp.tmp2 <- rpsp.tmp1[-c(1, n2), -c(1, n2)]
-        rcoords <- coords[sample(nstrata^2, 2), ]
-        startrows <- ((rcoords[1, 1] - 1) * n/nstrata + 1):((rcoords[1, 
+        rpsp.tmp2 = rpsp.tmp1[-c(1, n2), -c(1, n2)]
+        rcoords = coords[sample(nstrata^2, 2), ]
+        startrows = ((rcoords[1, 1] - 1) * n/nstrata + 1):((rcoords[1, 
             1] - 1) * n/nstrata + n/nstrata)
-        startcols <- ((rcoords[1, 2] - 1) * n/nstrata + 1):((rcoords[1, 
+        startcols = ((rcoords[1, 2] - 1) * n/nstrata + 1):((rcoords[1, 
             2] - 1) * n/nstrata + n/nstrata)
-        endrows <- ((rcoords[2, 1] - 1) * n/nstrata + 1):((rcoords[2, 
+        endrows = ((rcoords[2, 1] - 1) * n/nstrata + 1):((rcoords[2, 
             1] - 1) * n/nstrata + n/nstrata)
-        endcols <- ((rcoords[2, 2] - 1) * n/nstrata + 1):((rcoords[2, 
+        endcols = ((rcoords[2, 2] - 1) * n/nstrata + 1):((rcoords[2, 
             2] - 1) * n/nstrata + n/nstrata)
-        rpsp.tmp1[-c(1, n2), -c(1, n2)][startrows, startcols] <- rpsp.tmp2[endrows, 
+        rpsp.tmp1[-c(1, n2), -c(1, n2)][startrows, startcols] = rpsp.tmp2[endrows, 
             endcols]
-        rpsp.tmp1[-c(1, n2), -c(1, n2)][endrows, endcols] <- rpsp.tmp2[startrows, 
+        rpsp.tmp1[-c(1, n2), -c(1, n2)][endrows, endcols] = rpsp.tmp2[startrows, 
             startcols]
-        rpsp.tmp1 <- FixUnSamp(psp, rpsp.tmp1)
-        nstat <- .C("spatstat", as.double(as.vector(rpsp.tmp1)), 
+        rpsp.tmp1 = fixUnSampFalseBorder(psp, rpsp.tmp1)
+        nstat = .C("spatstat", as.double(as.vector(rpsp.tmp1)), 
             as.integer(n), as.double(rep(0, 4)))[[3]]
-        phiTemp <- .C("calcphi", as.double(nstat), as.double(ostat), 
+        phiTemp = .C("calcphi", as.double(nstat), as.double(ostat), 
             as.double(0))[[3]]
         if (phiTemp < phi) {
-            phi <- phiTemp
-            gtrials <- gtrials + 1
-            rpsp <- rpsp.tmp1
+            phi = phiTemp
+            gtrials = gtrials + 1
+            rpsp = rpsp.tmp1
         }
         else {
-            rpsp.tmp1 <- rpsp
+            rpsp.tmp1 = rpsp
         }
-        ntrials <- ntrials + 1
+        ntrials = ntrials + 1
     }
     if (phi > alpha & mtrials2 > 0) {
-        psp <- as.vector(psp)
-        rpsp <- as.vector(rpsp)
-        tmp <- .C("randpatpar", psp = as.double(psp), rpsp = as.double(rpsp), 
+        psp = as.vector(psp)
+        rpsp = as.vector(rpsp)
+        tmp = .C("randpatpar", psp = as.double(psp), rpsp = as.double(rpsp), 
             n = as.integer(n), ostat = as.double(rep(0, 4)), 
             nstat = as.double(rep(0, 4)), phi = as.double(0), 
             phiTemp = as.double(0), alpha = as.double(alpha), 
             pl = as.integer(pl - 1), nplaces = as.integer(length(pl) - 
                 1), ntrials = as.double(0), gtrials = as.double(0), 
             mtrials = as.double(mtrials2))
-        out <- c(i, phi, gtrials, tmp$phi, tmp$gtrials, tmp$rpsp)
+        out = c(i, phi, gtrials, tmp$phi, tmp$gtrials, tmp$rpsp)
     }
-    else out <- c(i, phi, gtrials, NA, NA, as.vector(rpsp))
-    out
+    else out = c(i, phi, gtrials, NA, NA, as.vector(rpsp))
+    return(out)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

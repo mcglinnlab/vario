@@ -1,5 +1,5 @@
-\name{v.graph}
-\alias{v.graph}
+\name{vGraph}
+\alias{vGraph}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-v.graph(vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE, ylim = NULL, xlab = NULL, ylab = NULL, cls = NULL)
+vGraph(vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE, ylim = NULL, xlab = NULL, ylab = NULL, cls = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -71,23 +71,23 @@ v.graph(vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE, ylim = NULL, xl
 function (vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE, 
     ylim = NULL, xlab = NULL, ylab = NULL, cls = NULL) 
 {
-    n <- sqrt(vobject$parms$N)
-    N <- n^2
-    S <- vobject$parms$S
-    coords <- cbind(rep(1:n, each = n), rep(1:n, times = n))
-    v <- vobject$vario
-    p <- vobject$p
+    n = sqrt(vobject$parms$N)
+    N = n^2
+    S = vobject$parms$S
+    coords = cbind(rep(1:n, each = n), rep(1:n, times = n))
+    v = vobject$vario
+    p = vobject$p
     if (is.null(cls)) {
-        cls <- c(rgb(127, 201, 127, alpha = 255 * 0.5, maxColorValue = 255), 
+        cls = c(rgb(127, 201, 127, alpha = 255 * 0.5, maxColorValue = 255), 
             rgb(190, 174, 212, alpha = 255 * 0.5, maxColorValue = 255), 
             rgb(253, 192, 134, alpha = 255 * 0.5, maxColorValue = 255))
     }
     if (is.null(xlab)) 
-        xlab <- "Spatial Lag"
+        xlab = "Spatial Lag"
     if (is.null(ylab)) 
-        ylab <- "Variance"
+        ylab = "Variance"
     if (!is.na(optim[1])) {
-        y <- 1:S
+        y = 1:S
         plot(sort(optim), y, axes = F, frame.plot = F, xlab = "grad", 
             ylab = "", xlim = c(0, max(optim)))
         axis(side = 1)
@@ -97,8 +97,8 @@ function (vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE,
             len = 0.01, code = 3)
     }
     if (vobject$perm) {
-        d <- vobject$vdists
-        quants <- apply(v, c(1, 2), quantile, c(0.025, 0.975))
+        d = vobject$vdists
+        quants = apply(v, c(1, 2), quantile, c(0.025, 0.975))
         if (is.null(ylim)) 
             ylim = range(list(quants, v[, , 1]))
         if (vobject$parms$pos.neg) {
@@ -125,7 +125,7 @@ function (vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE,
         if (is.null(ylim)) {
             if (vobject$parms$pos.neg) {
                 if (flip.neg) 
-                  v[, 8] <- v[, 8] * -1
+                  v[, 8] = v[, 8] * -1
                 ylim = range(list(v[, c(4:5, 7:8)], sum(p * (1 - 
                   p))))
             }

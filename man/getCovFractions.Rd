@@ -1,5 +1,5 @@
-\name{gauss.niche}
-\alias{gauss.niche}
+\name{getCovFractions}
+\alias{getCovFractions}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,21 +8,12 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-gauss.niche(m, z, u, s)
+getCovFractions(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{m}{
-%%     ~~Describe \code{m} here~~
-}
-  \item{z}{
-%%     ~~Describe \code{z} here~~
-}
-  \item{u}{
-%%     ~~Describe \code{u} here~~
-}
-  \item{s}{
-%%     ~~Describe \code{s} here~~
+  \item{x}{
+%%     ~~Describe \code{x} here~~
 }
 }
 \details{
@@ -56,9 +47,18 @@ gauss.niche(m, z, u, s)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (m, z, u, s) 
+function (x) 
 {
-    m * exp(-0.5 * (z - u)^2/s^2)
+    N = as.integer(nrow(x))
+    S = as.integer(ncol(x))
+    x = as.double(ifelse(is.na(x) | x == -999, -99999, x))
+    pos = as.double(rep(0, (N * (N - 1))/2))
+    neg = as.double(rep(0, (N * (N - 1))/2))
+    result = .C("loopcovreal", x, N, S, pos, neg)
+    out = list()
+    out$pos = result[[4]]
+    out$neg = result[[5]]
+    return(out)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

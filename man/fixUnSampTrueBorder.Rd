@@ -1,5 +1,5 @@
-\name{FixUnSamp2}
-\alias{FixUnSamp2}
+\name{fixUnSampTrueBorder}
+\alias{fixUnSampTrueBorder}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-FixUnSamp2(oarray, rarray)
+fixUnSampTrueBorder(oarray, rarray)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -53,51 +53,51 @@ FixUnSamp2(oarray, rarray)
 function (oarray, rarray) 
 {
     if (-999 \%in\% oarray) {
-        rarray.tmp <- rarray
+        rarray.tmp = rarray
         if (length(dim(oarray)) == 3) {
-            S <- dim(oarray)[1]
-            n <- dim(oarray)[2]
-            o.na <- oarray == -999
-            r.na <- rarray == -999
-            end.tmp <- which(o.na[1, , ])
+            S = dim(oarray)[1]
+            n = dim(oarray)[2]
+            o.na = oarray == -999
+            r.na = rarray == -999
+            end.tmp = which(o.na[1, , ])
             for (i in 1:S) {
-                start.tmp <- which(r.na[i, , ])
+                start.tmp = which(r.na[i, , ])
                 if (sum(which(!is.na(match(end.tmp, start.tmp)))) > 
                   0) {
-                  end <- end.tmp[-which(!is.na(match(end.tmp, 
+                  end = end.tmp[-which(!is.na(match(end.tmp, 
                     start.tmp)))]
-                  start <- start.tmp[-which(!is.na(match(start.tmp, 
+                  start = start.tmp[-which(!is.na(match(start.tmp, 
                     end.tmp)))]
                 }
                 else {
-                  end <- end.tmp
-                  start <- start.tmp
+                  end = end.tmp
+                  start = start.tmp
                 }
-                rarray[i, , ][end] <- rarray.tmp[i, , ][start]
-                rarray[i, , ][start] <- rarray.tmp[i, , ][end]
+                rarray[i, , ][end] = rarray.tmp[i, , ][start]
+                rarray[i, , ][start] = rarray.tmp[i, , ][end]
             }
         }
         else {
-            n2 <- dim(oarray)[1]
-            o.na <- oarray == -999
-            r.na <- rarray == -999
-            end.tmp <- which(o.na)
-            start.tmp <- which(r.na)
+            n2 = dim(oarray)[1]
+            o.na = oarray == -999
+            r.na = rarray == -999
+            end.tmp = which(o.na)
+            start.tmp = which(r.na)
             if (sum(which(!is.na(match(end.tmp, start.tmp)))) > 
                 0) {
-                end <- end.tmp[-which(!is.na(match(end.tmp, start.tmp)))]
-                start <- start.tmp[-which(!is.na(match(start.tmp, 
+                end = end.tmp[-which(!is.na(match(end.tmp, start.tmp)))]
+                start = start.tmp[-which(!is.na(match(start.tmp, 
                   end.tmp)))]
             }
             else {
-                end <- end.tmp
-                start <- start.tmp
+                end = end.tmp
+                start = start.tmp
             }
-            rarray[end] <- rarray.tmp[start]
-            rarray[start] <- rarray.tmp[end]
+            rarray[end] = rarray.tmp[start]
+            rarray[start] = rarray.tmp[end]
         }
     }
-    rarray
+    return(rarray)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

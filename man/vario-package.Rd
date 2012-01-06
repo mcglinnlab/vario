@@ -1,6 +1,6 @@
-\name{SpatCommStat-package}
-\alias{SpatCommStat-package}
-\alias{SpatCommStat}
+\name{vario-package}
+\alias{vario-package}
+\alias{vario}
 \docType{package}
 \title{
 What the package does (short line)
@@ -12,12 +12,11 @@ More about what it does (maybe more than one line)
 }
 \details{
 \tabular{ll}{
-Package: \tab SpatCommStat\cr
+Package: \tab vario\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2011-09-21\cr
+Date: \tab 2012-01-05\cr
 License: \tab What license is it under?\cr
-LazyLoad: \tab yes\cr
 }
 ~~ An overview of how to use the package, including the most important ~~
 ~~ functions ~~

@@ -1,5 +1,5 @@
-\name{v.graph.all}
-\alias{v.graph.all}
+\name{vGraphPerm}
+\alias{vGraphPerm}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-v.graph.all(vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA, xlims = NA, ylab = "variance", xlab = "lag", cls = NA, lwd = 1, plot.new = TRUE)
+vGraphPerm(vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA, xlims = NA, ylab = "variance", xlab = "lag", cls = NA, lwd = 1, plot.new = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -78,20 +78,20 @@ function (vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
     xlims = NA, ylab = "variance", xlab = "lag", cls = NA, lwd = 1, 
     plot.new = TRUE) 
 {
-    rflag <- !is.null(vrand)
-    sflag <- !is.null(vspat)
+    rflag = !is.null(vrand)
+    sflag = !is.null(vspat)
     if (rflag) {
-        dr <- vrand$vdists
-        vr <- vrand$vario[, 1, ]
+        dr = vrand$vdists
+        vr = vrand$vario[, 1, ]
     }
     if (sflag) {
-        ds <- vspat$vdists
-        vs <- vspat$vario
+        ds = vspat$vdists
+        vs = vspat$vario
     }
     if (is.na(xlims[1])) 
-        xlims <- range(dr, ds)
+        xlims = range(dr, ds)
     if (is.na(cls)) {
-        cls <- c(rgb(190, 174, 212, alpha = 255 * 0.5, maxColorValue = 255), 
+        cls = c(rgb(190, 174, 212, alpha = 255 * 0.5, maxColorValue = 255), 
             "#99CCFF", rgb(127, 201, 127, alpha = 255 * 0.5, 
                 maxColorValue = 255))
     }
@@ -101,7 +101,7 @@ function (vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
         else par(mfrow = c(1, 2))
     }
     if (rflag) {
-        q.rand <- apply(vr, 1, quantile, c(0.025, 0.975))
+        q.rand = apply(vr, 1, quantile, c(0.025, 0.975))
         ylims = range(q.rand, vr[, 1])
         plot(dr, vr[, 1], type = "n", ylab = ylab, xlab = xlab, 
             ylim = ylims, xlim = xlims, main = "Within-species Agg.")
@@ -111,8 +111,8 @@ function (vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
     }
     if (sflag) {
         if (obs.var) {
-            ovar <- vs[, 2, ] + vs[, 3, ]
-            q.obs <- apply(ovar, 1, quantile, c(0.025, 0.975))
+            ovar = vs[, 2, ] + vs[, 3, ]
+            q.obs = apply(ovar, 1, quantile, c(0.025, 0.975))
             ylims = range(q.obs, ovar)
             plot(ds, ovar[, 1], type = "n", ylab = ylab, xlab = xlab, 
                 ylim = ylims, xlim = xlims, main = "Total Between-species Agg.")
@@ -120,7 +120,7 @@ function (vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
                 length(ds):1]), border = NA, col = cls[1])
             lines(ds, ovar[, 1], col = 1, lwd = lwd)
         }
-        q.spat <- apply(vs, 1:2, quantile, c(0.025, 0.975))
+        q.spat = apply(vs, 1:2, quantile, c(0.025, 0.975))
         ylims = range(q.spat, vs[, , 1])
         plot(ds, vs[, 2, 1], type = "n", ylab = ylab, xlab = xlab, 
             ylim = ylims, xlim = xlims, main = "Pos/Neg Between-species Agg.")

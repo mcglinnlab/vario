@@ -1,5 +1,5 @@
-\name{SpatPerm2D.str}
-\alias{SpatPerm2D.str}
+\name{spatPermStrata}
+\alias{spatPermStrata}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-SpatPerm2D.str(psp, shiftpos = NULL, rotate = NULL, meth = "shift", sp = FALSE, nstrata = 1)
+spatPermStrata(psp, shiftpos = NULL, rotate = NULL, meth = "shift", sp = FALSE, nstrata = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -65,32 +65,33 @@ SpatPerm2D.str(psp, shiftpos = NULL, rotate = NULL, meth = "shift", sp = FALSE, 
 function (psp, shiftpos = NULL, rotate = NULL, meth = "shift", 
     sp = FALSE, nstrata = 1) 
 {
-    n <- dim(psp)[2]
+    n = dim(psp)[2]
     if (length(dim(psp)) == 3) {
-        S <- dim(psp)[1]
-        flag <- FALSE
+        S = dim(psp)[1]
+        flag = FALSE
     }
     else {
-        S <- 1
-        psp <- array(psp, dim = c(S, n, n))
-        flag <- TRUE
+        S = 1
+        psp = array(psp, dim = c(S, n, n))
+        flag = TRUE
     }
-    strata.size <- n/nstrata
-    if (round(strata.size) != strata.size) 
-        stop("Number of strata must be evenly divisable by the linear dimension of the grid")
-    Rpsp <- psp
-    brks <- seq(1, n, strata.size)
+    strata.size = n/nstrata
+    if (round(strata.size) != strata.size) {
+        stop("Number of strata must be evenly divisable by the linear dimension\n          of the grid")
+    }
+    Rpsp = psp
+    brks = seq(1, n, strata.size)
     for (i in 1:nstrata) {
-        sub.i <- brks[i]:(brks[i] + strata.size - 1)
+        sub.i = brks[i]:(brks[i] + strata.size - 1)
         for (j in 1:nstrata) {
-            sub.j <- brks[j]:(brks[j] + strata.size - 1)
-            Rpsp[, sub.i, sub.j] <- SpatPerm2D(psp[, sub.i, sub.j], 
+            sub.j = brks[j]:(brks[j] + strata.size - 1)
+            Rpsp[, sub.i, sub.j] = spatPerm2D(psp[, sub.i, sub.j], 
                 meth = meth, sp = sp, shiftpos = shiftpos, rotate = rotate)
         }
     }
     if (flag) 
-        Rpsp <- drop(Rpsp)
-    Rpsp
+        Rpsp = drop(Rpsp)
+    return(Rpsp)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

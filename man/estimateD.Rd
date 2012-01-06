@@ -1,5 +1,5 @@
-\name{grid.pres}
-\alias{grid.pres}
+\name{estimateD}
+\alias{estimateD}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,12 +8,12 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-grid.pres(x)
+estimateD(z)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{z}{
+%%     ~~Describe \code{z} here~~
 }
 }
 \details{
@@ -47,23 +47,15 @@ grid.pres(x)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (x) 
+function (z) 
 {
-    S <- ncol(x)
-    N <- nrow(x)
-    Psp <- array(0, dim = c(S, sqrt(N), sqrt(N)))
-    icount <- 0
-    for (col in 1:sqrt(N)) {
-        for (row in 1:sqrt(N)) {
-            icount <- icount + 1
-            for (sp in 1:S) {
-                if (x[icount, sp] > 0) {
-                  Psp[sp, row, col] <- 1
-                }
-            }
-        }
-    }
-    Psp
+    n = dim(z)[1]
+    gcords = expand.grid(1:n, 1:n)
+    v = vario(as.vector(z), gcords)$vario
+    mod = lm(log(v$exp) ~ log(v$Dist))
+    m = coef(mod)[2]
+    D = (6 - m)/2
+    return(D)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
