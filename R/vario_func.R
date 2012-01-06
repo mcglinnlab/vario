@@ -284,10 +284,11 @@
   }
   rpsp = fixUnSampFalseBorder(psp,rpsp)
   ostat = .C('spatstat',as.double(as.vector(psp)),as.integer(n),
-             as.double(rep(0,4)))[[3]]
+             as.double(rep(0,4)),PACKAGE = vario)[[3]]
   nstat = .C('spatstat',as.double(as.vector(rpsp)),as.integer(n),
-             as.double(rep(0,4)))[[3]]
-  phi = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0))[[3]]
+             as.double(rep(0,4)),PACKAGE = vario)[[3]]
+  phi = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0),
+           PACKAGE = vario)[[3]]
   ## now begin random swapping of blocks defined by strata 
   ntrials = 0 ; gtrials = 0
   rpsp.tmp1 = rpsp
@@ -306,8 +307,9 @@
     rpsp.tmp1[-c(1,n2),-c(1,n2)][endrows,endcols] = rpsp.tmp2[startrows,startcols]
     rpsp.tmp1 = fixUnSampFalseBorder(psp,rpsp.tmp1)
     nstat = .C('spatstat',as.double(as.vector(rpsp.tmp1)),as.integer(n),
-               as.double(rep(0,4)))[[3]]
-    phiTemp = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0))[[3]]
+               as.double(rep(0,4)),PACKAGE = vario)[[3]]
+    phiTemp = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0),
+                 PACKAGE = vario)[[3]]
     if(phiTemp < phi){
       phi = phiTemp
       gtrials = gtrials +1
@@ -331,7 +333,8 @@
              phi = as.double(0), phiTemp = as.double(0),
              alpha = as.double(alpha), pl = as.integer(pl-1),
              nplaces = as.integer(length(pl)-1),ntrials = as.double(0),
-             gtrials = as.double(0), mtrials = as.double(mtrials2))
+             gtrials = as.double(0), mtrials = as.double(mtrials2),
+             PACKAGE = vario)
     out = c(i,phi,gtrials,tmp$phi,tmp$gtrials,tmp$rpsp)
   }
   else
@@ -529,7 +532,7 @@
   x = as.double(ifelse(is.na(x) | x == -999,-99999,x))
   pos = as.double(rep(0,(N*(N-1))/2))
   neg = as.double(rep(0,(N*(N-1))/2))
-  result = .C('loopcovreal',x,N,S,pos,neg)
+  result = .C('loopcovreal',x,N,S,pos,neg,PACKAGE = vario)
   out = list()
   out$pos = result[[4]]
   out$neg = result[[5]]
@@ -666,7 +669,7 @@
     ## coords changed to coord
     u.ang = .C("tgangle", as.double(as.vector(coord[, 1])), 
               as.double(as.vector(coord[, 2])), as.integer(dim(coord)[1]), 
-              res = as.double(rep(0, length(as.vector(Dist)))))$res
+              res = as.double(rep(0, length(as.vector(Dist)))),PACKAGE = vario)$res
     if (any(is.na(u.ang))) 
       stop("NA returned in angle calculations maybe due to co-located data")
     u.ang = atan(u.ang)
