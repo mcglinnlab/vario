@@ -1,10 +1,10 @@
 Package: vario
-Type: Package
-Title: Compute multivariate community variograms, carry out null models, and graph results
 Version: 1.0
 Date: 2012-01-01
+Title: Compute multivariate community variograms, carry out null models, and graph results
 Author: Dan McGlinn
 Maintainer: Dan McGlinn <danmcglinn@gmail.com>
+Depends: R (>=2.10.0), vegan
 Description: This package computes the spatial community
 variograms first developed in Wagner (Ecology, 2003) and further
 described in McGlinn and Hurlbert (Oikos, submitted).
@@ -14,4 +14,5 @@ expectation.  McGlinn and Hurlbert (submitted) fully describe
 the null models implemented here.  Lastly this package provides
 graphical helper functions for examining the results.
 License: GPL-3
+URL: https://github.com/dmcglinn/vario
 LazyLoad: yes
