@@ -1,7 +1,7 @@
 Package: vario
 Version: 1.0
 Date: 2012-01-01
-Title: vario: comunity variograms for community ecologists
+Title: vario: community variograms and associated null models
 Author: Dan McGlinn
 Maintainer: Dan McGlinn <danmcglinn@gmail.com>
 Depends: R (>= 2.10.0), vegan
@@ -12,6 +12,6 @@ developed in Wagner (Ecology, 2003) and further described in McGlinn and Hurlber
 examine if the spatial patterns differ from chance expectation.  McGlinn and 
 Hurlbert (submitted) fully describe the null models implemented here.  Lastly this 
 package provides graphical helper functions for examining the results.
-License: GPL-3
+License: CC0
 URL: https://github.com/dmcglinn/vario
 LazyLoad: yes
