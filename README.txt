@@ -1,4 +1,4 @@
-Code for analzing community variograms
+Code for analyzing community variograms
 
 Copyright (c) 2012 Dan McGlinn
 
