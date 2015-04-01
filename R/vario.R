@@ -421,9 +421,9 @@ nullGen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FALS
                 rpop = fixUnSampTrueBorder(pop,rpop)
             }
             rmat = apply(rpop,1,as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
-            rv = vario(x=rmat,coord=coords,grain=grain,hmax=hmax,pos.neg=pos.neg,
-                       median=median,direction=direction,tolerance=tolerance,
-                       unit.angle=unit.angle)$vario
+            rv<-vario(x=rmat,coord=coords,grain=grain,breaks=breaks,hmin=hmin,hmax=hmax,
+                      pos.neg=pos.neg,median=median,direction=direction,tolerance=tolerance,
+                      unit.angle=unit.angle,distance.metric=distance.metric)$vario
             if(pos.neg){
                 if(median)
                     r.vals[,,j] = as.matrix(rv[,c(5,7:11)])
@@ -448,8 +448,9 @@ nullGen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FALS
             rpop = fixUnSampTrueBorder(pop,rpop)
         }
         rmat = apply(rpop,1,as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
-        rv = vario(x=rmat,coord=coords,grain=grain,hmax=hmax,pos.neg=pos.neg,median=median,
-                   direction=direction,tolerance=tolerance,unit.angle=unit.angle)$vario
+        rv<-vario(x=rmat,coord=coords,grain=grain,breaks=breaks,hmin=hmin,hmax=hmax,
+                  pos.neg=pos.neg,median=median,direction=direction,tolerance=tolerance,
+                  unit.angle=unit.angle,distance.metric=distance.metric)$vario
         if(pos.neg){
             if(median)
                 r.vals = as.matrix(rv[,c(5,7:11)])
