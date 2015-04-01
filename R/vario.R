@@ -215,6 +215,101 @@ vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
     return(vobject)
 }
 
+vario_uni = function(x, bisect=FALSE, ...)
+{
+    ## Purpose: to compute the multivariate variogram as well as individual univariate 
+    ## variograms for evey column of x
+    ## Arguments:
+    ## x : site x sp matrix
+    ## bisect : if the bisection style vairogram should be computed
+    ## ... : arguments supplied to the function vario()
+    ## Note: speed gains would be significant if partitioning of computation between
+    ## species was carried out within the vario function after computing the
+    ## distance matrix because that is a time intensive step
+    require(snowfall)
+    S = ncol(x)
+    if (bisect)
+        v = vario_bisect(x, ...)
+    else
+        v = vario(x, ...)
+    n_cpus = length(suppressMessages(sfGetCluster()))
+    if (n_cpus > 0) {
+        sfSource('./scripts/spat_functions.R')
+        sfLibrary(vegan)
+        if (bisect) 
+            exp_var = sfSapply(1:S, function(sp) vario_bisect(x[ , sp], ...)$vario$exp.var)
+        else
+            exp_var = sfSapply(1:S, function(sp) vario(x[ , sp], ...)$vario$exp.var)
+    }
+    else {
+        if (bisect)
+            exp_var = sapply(1:S, function(sp) vario_bisect(x[ , sp], ...)$vario$exp.var) 
+        else
+            exp_var = sapply(1:S, function(sp) vario(x[ , sp], ...)$vario$exp.var) 
+    }
+    colnames(exp_var) = paste('sp', 1:S, sep='')
+    v$exp.var = exp_var  
+    return(v)
+}
+
+get_breaks = function(breaks, hmin, hmax, maxDist, log=FALSE) {
+    ## compute breaks of distance bins used by the function vario()
+    ## Arguments:
+    ## breaks: either a vector of breaks or an integer number of 
+    ##  breaks to compute.  If a vector of breaks is supplied then
+    ##  the function returns that exact same vector back. 
+    ## hmin: minimum distance of interest 
+    ## hmax: maximum distance of interest
+    ## maxDist: maximum possible distance (greater or equal to hmax)
+    ## log: boolean, if true the breaks are equidistance on a log scale
+    if (length(breaks) == 1) {
+        if (log) {
+            if (round(hmax, 2) == round(maxDist / 2, 2)) {
+                incre = (hmax - hmin) / breaks
+                hmax = hmax + incre
+            }
+            breaks = exp(seq(log(hmin), log(hmax), length.out=breaks))
+        }
+        else 
+            breaks = seq(hmin, hmax, length.out=breaks)    
+    }
+    return(breaks)
+}
+
+check_vario_direction_args = function(direction = 'omnidirectional',
+                                      tolerance = pi/8,
+                                      unit.angle = c('radians', 'degrees')) {
+    ## This function carries out sanity checks on the directional
+    ## arguments that are supplied to the function vario(), if 
+    ## these checks are failed then vario() will stop with an error message
+    ## Note: this code was copied from geoR in the function variog
+    if (mode(direction) == "numeric") {
+        if (length(direction) > 1)
+            stop("only one direction is allowed")
+        if (length(tolerance) > 1)
+            stop("only one tolerance value is allowed")
+        if (unit.angle == "degrees") {
+            ang.deg = direction
+            ang.rad = (ang.deg * pi) / 180
+            tol.deg = tolerance
+            tol.rad = (tol.deg * pi) / 180
+        }
+        else {
+            ang.rad = direction
+            ang.deg = (ang.rad * 180) / pi
+            tol.rad = tolerance
+            tol.deg = (tol.rad * 180) / pi
+        }
+        if (ang.rad > pi | ang.rad < 0)
+            stop("direction must be an angle in the interval [0,pi[ radians")
+        if (tol.rad > pi/2 | tol.rad < 0)
+            stop("tolerance must be an angle in the interval [0,pi/2] radians")
+        if (tol.deg >= 90) {
+            direction = "omnidirectional"
+        }
+    }  
+}
+
 getCovFractions = function(x) {
     ## Purpose: calculates the lower diagonal of a sp covariance matrix
     ## to provide the positive and negative fractions of covariance
@@ -1124,6 +1219,116 @@ spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',
         Rpsp = drop(Rpsp)
     return(Rpsp)
     }
+
+shuffle_comm = function(comm, swap) {
+    ## Purpose: to returned a shuffled community site x species matrix
+    ## Arguments:
+    ## comm: site x species matrix with abundance or pres/absen data
+    ## swap: two options: 'indiv' or 'quad' for individual or quadrat-based shuffling
+    if (swap == 'indiv') {
+        nquad = nrow(comm)
+        comm_shuffled = comm
+        for (j in 1:ncol(comm)) {
+            rand_samp = sample(nquad, size=sum(comm[ , j]), replace=T)
+            comm_shuffled[ , j] = as.numeric(table(c(rand_samp, 1:nquad)) - 1)
+        }
+    }
+    else if (swap == 'quad')
+        comm_shuffled = comm[sample(nrow(comm)), ]
+    else
+        stop('swap must be "indiv" or "quad"')
+    return(comm_shuffled)
+}
+
+random_shuffle = function(x, vobject, swap, nperm, npar, coords=NULL, breaks=NA) {
+    ## Purpose: to generate individual or sample-based random shuffle statistical
+    ## null expectations for variograms. 
+    ## Note: With the sample-based shuffling the mean of the null distribution is
+    ## the same as the average variance across all distance classes. So shuffling
+    ## is only useful in deriving the variance around that expectation.
+    ## Note: if x is a presence-absence matrix then the individual and sample-based
+    ## approaches will generate identical within-species variograms
+    ##Arguments:
+    ##"x" is either an output of class 'sim' that is the output of 'sim.neut.uni' OR an site x species matrix
+    ##"vobject" is the output of 'vario', this informs the function of what parameterization of vario to use
+    ###specifically it indiates if the pos.neg components and median should be calculated
+    ##"swap" two options: 'indiv' or 'quad' for individual or quadrat-based shuffling
+    ### repsectively. 
+    ##"nperm" is the number of permutations
+    ##"npar" is the number of processors to run the analysis over
+    ##"coords" the spatial coordinates of the sites, not needed if x is of class 'sim'
+    ##"breaks" what spatial breaks to use
+    ## NOTE: this function requires snowfall and rlecuyer packages are loaded
+    dists = vobject$vario$Dist
+    grain = vobject$parms$grain
+    hmin = vobject$parms$hmin
+    hmax = vobject$parms$hmax
+    pos.neg = vobject$parms$pos.neg
+    median = vobject$parms$median
+    if (class(vobject$parms$direction) == "factor") 
+        direction = as.character(vobject$parms$direction)
+    else
+        direction = as.numeric(vobject$parms$direction)
+    tolerance = vobject$parms$tolerance
+    unit.angle = as.character(vobject$parms$unit.angle)
+    if (is.na(unit.angle))
+        unit.angle = 'degrees'
+    distance.metric = as.character(vobject$parms$distance.metric)
+    if (is.null(coords))
+        stop('need to supply spatial coordinates if not a simulation product')
+    r.vals = list()
+    r.vals$parms = vobject$parms
+    r.vals$p = vobject$p
+    if (npar > 1) {
+        sfClusterSetupRNG()
+        sfSource('./scripts/spat_functions.R')
+        sfExport('x', 'swap', 'coords', 'distance.metric')
+        if (direction == 'bisection') {
+            rv = sfSapply(1:nperm, function(...)
+                vario_bisect(shuffle_comm(x, swap), coords,
+                             distance.metric=distance.metric)$vario[ , 'exp.var'])
+        }  
+        else {
+            sfExport('grain','breaks','hmin','hmax','pos.neg','median','direction',
+                     'tolerance','unit.angle')
+            rv = sfLapply(1:nperm, function(...)
+                vario(shuffle_comm(x, swap), coords, grain=grain, breaks=breaks, hmin=hmin,
+                      hmax=hmax, pos.neg=pos.neg, median=median, direction=direction,
+                      tolerance=tolerance, unit.angle=unit.angle,
+                      distance.metric=distance.metric)$vario[ , c('exp.var', 'obs.var')])
+        }  
+    }
+    else {
+        if (direction == 'bisection')
+            rv = sapply(1:nperm, function(...)
+                vario_bisect(shuffle_comm(x, swap), coords,
+                             distance.metric=distance.metric)$vario[ , 'exp.var'])
+        else
+            rv = lapply(1:nperm, function(...)
+                vario(shuffle_comm(x, swap), coords, grain=grain, breaks=breaks, hmin=hmin,
+                      hmax=hmax, pos.neg=pos.neg, median=median, direction=direction,
+                      tolerance=tolerance, unit.angle=unit.angle,
+                      distance.metric=distance.metric)$vario[ , c('exp.var', 'obs.var')])
+    }
+    if (is.matrix(rv)) 
+        rv_dim = dim(rv)
+    else if (is.list(rv))
+        rv_dim = dim(rv[[1]])
+    r.vals$vario = array(NA, dim= rv_dim + c(0, 1))
+    if (direction == 'bisection') {
+        r.vals$vario[ , 1] = as.matrix(vobject$vario[ , 'exp.var'])
+        r.vals$vario[ , -1] = rv
+    }
+    else {
+        r.vals$vario[ , , 1] = as.matrix(vobject$vario[ , c('exp.var', 'obs.var')])
+        r.vals$vario[ , , -1] = array(unlist(rv), dim=c(rv_dim, nperm))  
+    }
+    r.vals$perm = TRUE
+    r.vals$vdists = vobject$vario$Dist
+    return(r.vals)
+}
+
+
 
 
 ## Plotting Functions-----------------------------------------------------------
