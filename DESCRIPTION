@@ -1,17 +1,15 @@
 Package: vario
-Version: 1.0
+Title: Community variograms and associated null models
+Description: This is a package
+Version: 0.1
 Date: 2012-01-01
-Title: vario: community variograms and associated null models
 Author: Dan McGlinn
 Maintainer: Dan McGlinn <danmcglinn@gmail.com>
-Depends: R (>= 2.10.0), vegan
-Suggests: snowfall
-Description: This package computes the spatial community variograms first 
-developed in Wagner (Ecology, 2003) and further described in McGlinn and Hurlbert 
-(in prep). Additionally code is provided to carry out null model analysis to 
-examine if the spatial patterns differ from chance expectation.  McGlinn and 
-Hurlbert (submitted) fully describe the null models implemented here.  Lastly this 
-package provides graphical helper functions for examining the results.
-License: CC0
+Depends: R (>= 2.15.0)
+Imports: vegan
+Suggests: snowfall, testthat
+NeedsCompilation: yes
+License: MIT
 URL: https://github.com/dmcglinn/vario
-LazyLoad: yes
+LazyLoad: true
+Collate: vario.R
