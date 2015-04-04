@@ -1,61 +1,61 @@
 ## Spatial analysis functions---------------------------------------------------
+#' Calculate uni- and multi-variate variograms
+#'
+#' This code is largely modified from the 'vegan' function 'mso' by Helene
+#' Wagner, also parts of this code were derived from the 'geoR' function 'vairog'
+#' by Paulo J. Ribeiro Jr. and Peter J. Diggle. 
+#' Citations:
+#' Jari Oksanen, F. Guillaume Blanchet, Roeland Kindt, Pierre Legendre,
+#'   Peter R. Minchin, R. B. O'Hara, Gavin L. Simpson, Peter Solymos, M.
+#'   Henry H. Stevens and Helene Wagner (2011). vegan: Community Ecology
+#'   Package. R package version 2.0-2.
+#'   http://CRAN.R-project.org/package=vegan
+#' Paulo J. Ribeiro Jr & Peter J. Diggle geoR: a package for
+#'   geostatistical analysis R-NEWS, 1(2):15-18. June, 2001
+#' 
+#' Note: that if some areas are unsampled that obs != pos + neg + exp
+#' @param x an object of class 'sim' or may be a sitexsp matrix, a vector of
+#'   values, if x is the later then missing samples should be coded as -999
+#' @param coord the spatial coordinates
+#' @param grain interval size for distance classes, only used if 'breaks' not
+#'   supplied
+#' @param breaks the spatial breaks that define the spatial lags to be compared
+#' @param hmax the maximum spatial lag
+#' @param round.up if TRUE the spatial lags are rounded up to nearest integer
+#' @param pos.neg if TRUE the positive and negative parts of the covariance
+#'   matrix are output
+#' @param binary if TRUE and x is class sim then abundances are converted to 
+#'   binary 0 1 values
+#' @param snap indicates which generation from an object class 'sim' to draw
+#'   from
+#' @param median indicates if in addition to the mean the medians of the
+#'   distance matrices are calculated
+#' @param direction a numerical value for the directional (azimuth) angle. This 
+#'   used to specify directional variograms. Default defines the omnidirectional
+#'   variogram. The value must be in the interval [0, pi] radians ([0, 180]
+#'   degrees).
+#' @param tolerance numerical value for the tolerance angle, when computing 
+#'   directional variograms. The value must be in the interval [0, pi/2] radians
+#'   ([0, 90] degrees).  Defaults to pi/8.
+#' @param unit.angle defines the unit for the specification of angles in the two
+#'   previous arguments. Options are 'radians' and 'degrees', with default to
+#'   'radians'.
+#' @param distance.metric can be one of the speices turnover metrics listed by
+#'   the vegan function vegdist(). This is only appropriate if pos.neg = FALSE. 
+#'   Common options include, 'jaccard' and 'bray'. If computed on pres/abse data
+#'   then soreson index is computed by 'bray'.
+#' @param min minimum value
+#' @param max maximum value
+#' @export
+#' @examples
+#' x = matrix(runif(100), ncol=10, nrow=10)
+#' coord = cbind(1:10, 1)
+#' vario(x, coord)
 vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
                  hmax=NA, round.int=FALSE, pos.neg=FALSE, binary=TRUE,
                  snap=NA, median=FALSE, quants=NA, direction = 'omnidirectional',
                  tolerance = pi/8, unit.angle = c('radians', 'degrees'),
-                 distance.metric = 'euclidean', univariate=FALSE)
-{
-    ## Purpose: calculates uni- and multi-variate variograms
-    ##
-    ## This code is largely modified from the 'vegan' function 'mso' by Helene
-    ## Wagner, also parts of this code were derived from the 'geoR' function 'vairog'
-    ## by Paulo J. Ribeiro Jr. and Peter J. Diggle.
-    ## Citations:
-    ## Jari Oksanen, F. Guillaume Blanchet, Roeland Kindt, Pierre Legendre,
-    ## Peter R. Minchin, R. B. O'Hara, Gavin L. Simpson, Peter Solymos, M.
-    ## Henry H. Stevens and Helene Wagner (2011). vegan: Community Ecology
-    ## Package. R package version 2.0-2.
-    ## http://CRAN.R-project.org/package=vegan
-    ## Paulo J. Ribeiro Jr & Peter J. Diggle geoR: a package for
-    ## geostatistical analysis R-NEWS, 1(2):15-18. June, 2001
-    ##
-    ## Note: that if some areas are unsampled that obs != pos + neg + exp
-    ## Arguments:
-    ## x: an object of class 'sim' or may be a sitexsp matrix, a vector of values,
-    ##   if x is the later then missing samples should be coded as -999
-    ## coord: the spatial coordinates
-    ## grain: interval size for distance classes, only used if 'breaks' not supplied
-    ## breaks: the spatial breaks that define the spatial lags to be compared
-    ## log: boolean, if true then the breaks are equidistance  
-    ## hmin: the minimum spatial lag, default value of NA is treated as a minimum
-    ##   of 1
-    ## hmax: the maximum spatial lag, default value of NA is treated as half of 
-    ##   the maximum distance
-    ## round.int: if TRUE the spatial lags are rounded to nearest integer
-    ## pos.neg: if TRUE the positive and negative parts of the covariance matrix
-    ##   are output
-    ## binary: if TRUE and x is class sim then abundances are converted to
-    ## binary 0 1 values
-    ## snap: indicates which generation from an object class 'sim' to draw from
-    ## median: indicates if in addition to the mean the medians of the distance
-    ##   matrices are calculated
-    ## direction: a numerical value for the directional (azimuth) angle. This
-    ##   used to specify directional variograms. Default defines the
-    ##   omnidirectional variogram. The value must be in the interval [0, pi] 
-    ##   radians ([0, 180] degrees).
-    ## quants: any quantiles to compute, these offer rough estimates of variability
-    ##   in the empirical variogram
-    ## tolerance: numerical value for the tolerance angle, when computing
-    ##   directional variograms. The value must be in the interval [0, pi/2]
-    ##   radians ([0, 90] degrees). Defaults to pi/8.
-    ## unit.angle: defines the unit for the specification of angles in the two
-    ##   previous arguments. Options are 'radians' and 'degrees', with default to
-    ##   'radians'.
-    ## distance.metric': can be one of the speices turnover metrics listed by the
-    ##   vegan function vegdist(). This is only appropriate if pos.neg = FALSE.
-    ##   Common options include, 'jaccard' and 'bray'. If computed on pres/abse
-    ##   data then soreson index is computed by 'bray'.
-    ## univariate: if TRUE then results are computed on a per species basis
+                 distance.metric = 'euclidean', univariate=FALSE){
     if (class(x) == "sim"){
         coord = x$coords
         if (is.na(snap))
@@ -215,17 +215,23 @@ vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
     return(vobject)
 }
 
-vario_uni = function(x, bisect=FALSE, ...)
-{
-    ## Purpose: to compute the multivariate variogram as well as individual univariate 
-    ## variograms for evey column of x
-    ## Arguments:
-    ## x : site x sp matrix
-    ## bisect : if the bisection style vairogram should be computed
-    ## ... : arguments supplied to the function vario()
-    ## Note: speed gains would be significant if partitioning of computation between
-    ## species was carried out within the vario function after computing the
-    ## distance matrix because that is a time intensive step
+#' Computes univariate variograms for evey column of input matrix in addition to
+#' the multivariate variogram
+#' 
+#' @param x site x sp matrix
+#' @param bisect if the bisection style vairogram should be computed
+#' @param ... arguments supplied to the function vario() Developer note speed 
+#'   gains would be significant if partitioning of computation between species 
+#'   was carried out within the vario function after computing the distance 
+#'   matrix because that is a time intensive step
+#' @export
+#' @examples
+#' x = matrix(runif(100), ncol=10, nrow=10)
+#' coord = cbind(1:10, 1)
+#' vario_uni(x, coord=coord) 
+#' # alternatively call from vario() 
+#' vario(x, coord, univariate=T)
+vario_uni = function(x, bisect=FALSE, ...){
     require(snowfall)
     S = ncol(x)
     if (bisect)
@@ -234,7 +240,7 @@ vario_uni = function(x, bisect=FALSE, ...)
         v = vario(x, ...)
     n_cpus = length(suppressMessages(sfGetCluster()))
     if (n_cpus > 0) {
-        sfSource('./scripts/spat_functions.R')
+        sfLibrary(vario)
         sfLibrary(vegan)
         if (bisect) 
             exp_var = sfSapply(1:S, function(sp) vario_bisect(x[ , sp], ...)$vario$exp.var)
@@ -252,16 +258,20 @@ vario_uni = function(x, bisect=FALSE, ...)
     return(v)
 }
 
+#' Compute spatial breaks of distance bins used by the function vario()
+#' 
+#' @param breaks either a vector of breaks or an integer number of breaks to 
+#'   compute. If a vector of breaks is supplied then the function returns that 
+#'   exact same vector back.
+#' @param hmin minimum distance of interest
+#' @param hmax maximum distance of interest
+#' @param maxDist maximum possible distance (greater or equal to hmax)
+#' @param log boolean, if true the breaks are equidistance on a log scale
+#' @export
+#' @examples
+#' get_breaks(4, 1, 16, 16)
+#' get_breaks(4, 1, 16, 16, log=T)
 get_breaks = function(breaks, hmin, hmax, maxDist, log=FALSE) {
-    ## compute breaks of distance bins used by the function vario()
-    ## Arguments:
-    ## breaks: either a vector of breaks or an integer number of 
-    ##  breaks to compute.  If a vector of breaks is supplied then
-    ##  the function returns that exact same vector back. 
-    ## hmin: minimum distance of interest 
-    ## hmax: maximum distance of interest
-    ## maxDist: maximum possible distance (greater or equal to hmax)
-    ## log: boolean, if true the breaks are equidistance on a log scale
     if (length(breaks) == 1) {
         if (log) {
             if (round(hmax, 2) == round(maxDist / 2, 2)) {
@@ -276,13 +286,13 @@ get_breaks = function(breaks, hmin, hmax, maxDist, log=FALSE) {
     return(breaks)
 }
 
+#' Internal function that carries out checks on the directional arguments that
+#' are supplied to the function vario(), if these checks are failed then vario()
+#' will stop with an error message
+#' Note: this code was copied from the package geoR in the function variog
 check_vario_direction_args = function(direction = 'omnidirectional',
                                       tolerance = pi/8,
                                       unit.angle = c('radians', 'degrees')) {
-    ## This function carries out sanity checks on the directional
-    ## arguments that are supplied to the function vario(), if 
-    ## these checks are failed then vario() will stop with an error message
-    ## Note: this code was copied from geoR in the function variog
     if (mode(direction) == "numeric") {
         if (length(direction) > 1)
             stop("only one direction is allowed")
@@ -310,44 +320,57 @@ check_vario_direction_args = function(direction = 'omnidirectional',
     }  
 }
 
+#' Calculate the lower diagonal of a sp covariance matrix
+#' 
+#' @return positive and negative fractions of covariance as two lower triangular
+#'   matrices, each in vector format
+#' @param x is a sitexsp matrix (sp as columns) of real numbers rows are the 
+#'   sites, columns are the species
+#' @export
+#' @examples
+#' x = matrix(runif(100), 10, 10)
+#' getCovFractions(x)
 getCovFractions = function(x) {
-    ## Purpose: calculates the lower diagonal of a sp covariance matrix
-    ## to provide the positive and negative fractions of covariance
-    ## output is two lower triangular matrices, each in vector format
-    ## Called within the function 'vario'
-    ## Arguments: 
-    ## x is a sitexsp matrix (sp as columns) of real numbers
-    ## rows are the sites, columns are the species
     N = as.integer(nrow(x))
     S = as.integer(ncol(x)) 
     x = as.double(ifelse(is.na(x) | x == -999,-99999,x))
     pos = as.double(rep(0,(N*(N-1))/2))
     neg = as.double(rep(0,(N*(N-1))/2))
-    result = .C('loopcovreal',x,N,S,pos,neg,PACKAGE = vario)
+    result = .C('loopcovreal',x,N,S,pos,neg,PACKAGE = 'vario')
     out = list()
     out$pos = result[[4]]
     out$neg = result[[5]]
     return(out)
 } 
 
-estimateD = function(z) {
-    ##esimates the fractal dimension D from a 2-dimensional grid
-    ##z is a matrix of real numbers
-    n = dim(z)[1]
-    gcords = expand.grid(1:n,1:n)
-    v = vario(as.vector(z),gcords)$vario
-    mod = lm(log(v$exp)~log(v$Dist))
+#' Estimates the fractal dimension D from a 2-dimensional grid
+#'
+#' @param x is a matrix of real numbers
+#' @param coord the spatial coordinates
+#' @export
+#' @examples
+#' x = matrix(runif(100), 10, 10)
+#' estimateD(x)
+estimateD = function(x, coord=NULL) {
+    n = dim(x)[1]
+    if(is.null(coord)) 
+        coord= expand.grid(1:n, 1:n)
+    v = vario(as.vector(x), coord)$vario
+    mod = lm(log(v$exp) ~ log(v$Dist))
     m = coef(mod)[2]
-    D = (6-m)/2
+    D = (6 - m) / 2
     return(D)
 }
 
 ## Permutation functions -------------------------------------------------------
 
+#' Internal function that maintains the spatial locations of the unsampled
+#' pixels in a random realization of a two dimentioal spatial array. -999 is the
+#' identifier for unsampled cells, in this case oarray and rarray DO have a
+#' false border of -999
+#' @param oarray observed starting array
+#' @param rarray randomized array
 fixUnSampFalseBorder = function(oarray,rarray){
-    ## Purpose: to maintain the spatial locations of the unsampled pixels in
-    ## rarray which is a random realization of oarray, -999 is the identifier for 
-    ## unsampled cells, in this case oarray and rarray DO have a false border of -999
     rarray.tmp = rarray
     if(length(dim(oarray)) == 3){ ## if multiple species then
         n2 = dim(oarray)[2]
@@ -392,11 +415,13 @@ fixUnSampFalseBorder = function(oarray,rarray){
     return(rarray)
 }
 
+#' Internal function that maintains the spatial locations of the unsampled 
+#' pixels in a random realization of a two dimentioal spatial array. -999 is the
+#' identifier for unsampled cells, in this case oarray and rarray DO NOT have a 
+#' false border of -999
+#' @param oarray observed starting array
+#' @param rarray randomized array
 fixUnSampTrueBorder = function(oarray,rarray){
-    ## purpose: to maintain the spatial locations
-    ## of the unsampled pixels in rarray which is a random
-    ## realization of oarray, -999 is the identifier for 
-    ## unsampled cells, in this case oarray and rarray DO NOT have a false border of -999
     if(-999 %in% oarray){  
         rarray.tmp = rarray
         if(length(dim(oarray)) == 3){  ## if multiple species then
@@ -440,35 +465,33 @@ fixUnSampTrueBorder = function(oarray,rarray){
     return(rarray)
 }
 
-
-
+#' Mediate the generation of statistical null values for the variograms
+#' 
+#' This function is to be used in a parrallel processing loop which will 
+#' generate a population of null values
+#' 
+#' @param pop the species x row x col array where row and column refer to 
+#'   spatial location
+#' @param vobject the output of the vario function with serves as the basis for 
+#'   empirical comparisons
+#' @param coords the spatial coordinates of a M^2 x S matrix
+#' @param meth the type of permutation to use, options include: reflect: random 
+#'   reflection/rotations of species (only makes sence when sp are not fixed 
+#'   shift: random torodial shifting with or with sp fixed both: both reflection
+#'   and shifting random: random shuffle randpat: random patterns algo of 
+#'   Roxburgh and Chesson 1998, must parameterize RPargs (See below)
+#' @param sp boolean, if FALSE then obs composition of quadrats is fixed to the 
+#'   observed pattern, if TRUE then species are each shuffled independently
+#' @param all boolean, if TRUE then all relevant nulls are calculated
+#' @param RPargs a list of arguments that must be supplied if the random 
+#'   patterns algo is desired, the arguments of RPargs are input into the 
+#'   function 'randPatPar', they include: 1) allRP if TRUE & all = TRUE, then 
+#'   Random Patterns algo used as the spatial null, 2)nstrata, 3)mtrials1, 
+#'   4)mtrials2, 5)alpha, 6)npar
+#' @param median: if TRUE then means and medians are calculated Note: 'meth' and
+#'   'sp' are arguments to randomization function 'spatPerm2D'
+#' @export
 nullGen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FALSE) {
-    ## Purpose: to mediate the generation of statistical null values for the variograms 
-    ## to be used in a parrallel processing loop which will generate a population
-    ## of null values
-    ## Arguments:
-    ## pop: the species x row x col array where row and column refer to spatial location
-    ## vobject: the output of the vario function with serves as the basis for 
-    ##          empirical comparisons
-    ## coords: the spatial coordinates of a M^2 x S matrix
-    ## meth: the type of permutation to use, options include:
-    ##       reflect: random reflection/rotations of species (only makes sence
-    ##                when sp are not fixed
-    ##       shift: random torodial shifting with or with sp fixed
-    ##       both: both reflection and shifting
-    ##       random: random shuffle
-    ##       randpat: random patterns algo of Roxburgh and Chesson 1998, must
-    ##                parameterize RPargs (See below)
-    ## sp: boolean, if FALSE then obs composition of quadrats is fixed to the
-    ##     observed pattern, if TRUE then species are each shuffled independently
-    ## all: boolean, if TRUE then all relevant nulls are calculated
-    ## RPargs: a list of arguments that must be supplied if the random patterns
-    ##         algo is desired, the arguments of RPargs are input into the
-    ##         function 'randPatPar', they include:
-    ##         1)allRP if TRUE & all = TRUE, then Random Patterns algo used as the
-    ##         spatial null, 2)nstrata, 3)mtrials1, 4)mtrials2, 5)alpha, 6)npar
-    ## median: if TRUE then means and medians are calculated
-    ## Note: 'meth' and 'sp' are arguments to randomization function 'spatPerm2D'
     S = dim(pop)[1]
     n = dim(pop)[2]
     n2 = n+2
@@ -558,43 +581,40 @@ nullGen = function(pop,vobject,coords,meth,sp,all=FALSE,RPargs=FALSE,median=FALS
     return(r.vals)
 }
 
+#' Generate statistical null expectations for the variograms
+#' 
+#' @param x is either an output of class 'sim' that is the output of 
+#'   'sim.neut.uni' OR an site x species matrix
+#' @param vobject is the output of 'vario', this informs the function of what 
+#'   parameterization of vario to use specifically it indiates if the pos.neg 
+#'   components and median should be calculated
+#' @param nperm is the number of permutations
+#' @param coords the spatial coordinates of the sites, not needed if x is of 
+#'   class 'sim'
+#' @param meth the type of permutation to use, options include: reflect: random 
+#'   reflection/rotations of species (only makes sence when sp are not fixed 
+#'   shift: random torodial shifting with or with sp fixed both: both reflection
+#'   and shifting random: random shuffle randpat: random patterns algo of 
+#'   Roxburgh and Chesson 1998, must parameterize RPargs (See below)
+#' @param sp boolean, if FALSE then obs composition of quadrats is fixed to the 
+#'   observed pattern, if TRUE then species are each shuffled independently
+#' @param all boolean, if TRUE then all relevant nulls calculated
+#' @param snap is the time period of the simulation to analyze,defaults to NULL 
+#'   val, if not set gets internally set to last time period
+#' @param npar number of processors to run the function on
+#' @param median if TRUE then median is also calculated in addition to mean
+#' @param linux if TRUE then function assumes you are on a linux cluster and 
+#'   therefore exports a different compiled code
+#' @param RPargs is a vector of arguments that are needed to perform the Random 
+#'   Patterns spatial null model
+#' @param breaks gives either the number or the position of the breaks for the 
+#'   function vario Notes: 1) see the notes associated with the function 
+#'   'nullGen' that indicate how 'RPargs" should be parameterized 2) 'meth' and 
+#'   'sp' are arguments to randomization function 'spatPerm2D'
+#' @export
 nullPerm = function(x, vobject, nperm, coords=NULL, meth='both',
                     sp=TRUE, all=FALSE, snap=NULL, npar=1, linux=FALSE,
                     RPargs=FALSE, breaks=NA) {
-    ## Purpose: to generate statistical null expectations for the variograms
-    ## Arguments:
-    ## x: is either an output of class 'sim' that is the output of 'sim.neut.uni'
-    ##    OR an site x species matrix
-    ## vobject: is the output of 'vario', this informs the function of what
-    ##          parameterization of vario to use specifically it indiates if the
-    ##          pos.neg components and median should be calculated
-    ## nperm: is the number of permutations
-    ## coords: the spatial coordinates of the sites, not needed if x is of class 'sim'
-    ## meth: the type of permutation to use, options include:
-    ##       reflect: random reflection/rotations of species (only makes sence
-    ##                when sp are not fixed
-    ##       shift: random torodial shifting with or with sp fixed
-    ##       both: both reflection and shifting
-    ##       random: random shuffle
-    ##       randpat: random patterns algo of Roxburgh and Chesson 1998, must
-    ##                parameterize RPargs (See below)
-    ## sp: boolean, if FALSE then obs composition of quadrats is fixed to the
-    ##     observed pattern, if TRUE then species are each shuffled independently
-    ## all: boolean, if TRUE then all relevant nulls calculated
-    ## snap: is the time period of the simulation to analyze,defaults to NULL val,
-    ##       if not set gets internally set to last time period
-    ## npar: number of processors to run the function on
-    ## median: if TRUE then median is also calculated in addition to mean
-    ## linux: if TRUE then function assumes you are on a linux cluster and
-    ##        therefore exports a different compiled code
-    ## RPargs: is a vector of arguments that are needed to perform the Random
-    ##         Patterns spatial null model
-    ## breaks: gives either the number or the position of the breaks for the
-    ##         function vario
-    ## Notes: 
-    ## 1) see the notes associated with the function 'nullGen' that indicate how 
-    ##    'RPargs" should be parameterized
-    ## 2) 'meth' and 'sp' are arguments to randomization function 'spatPerm2D'
     dists = vobject$vario$Dist
     grain = vobject$parms$grain
     hmin = vobject$parms$hmin
@@ -828,21 +848,25 @@ nullPerm = function(x, vobject, nperm, coords=NULL, meth='both',
     return(r.vals)
 }
 
+#' Random Patterns spatial permutation algorithm
+#' 
+#' This function evaulates the .C function 'randpatpar' which is the random
+#' patterns algo of Roxburgh and Chesson 1998. Returns species index, phi stat,
+#' number of actual swaps, and the randomized presences as a single vector of
+#' numbers. To be called in serial or parallel by function "randPatPar'
+#' @param i the ith species index
+#' @param psp multidimenstional S x (n+2) x (n+2) array
+#' @param rpsp a randomized version of psp
+#' @param n the size of the orginal 2-D array along one spatial axis (i.e.,
+#'   without extra rows and columns)
+#' @param pl the places in rpsp that can be swaped
+#' @param mtrials1 the number of times to attempt a swap at the strata level
+#' @param mtrials2 the number of times to attempt a swap at the pixel level
+#' @param alpha the cutoff value for the phi statistic of Roxburgh and Chesson
+#'   1998
+#' @export
 randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
                    alpha=0.01){
-    ## Purpose: to be called in serial or parallel by function "randPatPar'
-    ## this function evaulates the .C function 'randpatpar' which is the random patterns algo of
-    ## Roxburgh and Chesson 1998. Returns species index, phi stat, number of actual swaps, and the 
-    ## randomized presences as a single vector of numbers
-    ## Arguments:
-    ## i: the ith species index
-    ## psp: multidimenstional S x (n+2) x (n+2) array
-    ## rpsp: a randomized version of psp
-    ## n: the size of the orginal 2-D array along one spatial axis (i.e., without extra rows and columns)
-    ## pl: the places in rpsp that can be swaped
-    ## mtrials1: the number of times to attempt a swap at the strata level
-    ## mtrials2: the number of times to attempt a swap at the pixel level
-    ## alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
     psp = psp[i,,]
     rpsp = rpsp[i,,]
     n2 = n+2
@@ -860,11 +884,11 @@ randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
     }
     rpsp = fixUnSampFalseBorder(psp,rpsp)
     ostat = .C('spatstat',as.double(as.vector(psp)),as.integer(n),
-               as.double(rep(0,4)),PACKAGE = vario)[[3]]
+               as.double(rep(0,4)),PACKAGE = "vario")[[3]]
     nstat = .C('spatstat',as.double(as.vector(rpsp)),as.integer(n),
-               as.double(rep(0,4)),PACKAGE = vario)[[3]]
+               as.double(rep(0,4)),PACKAGE = "vario")[[3]]
     phi = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0),
-             PACKAGE = vario)[[3]]
+             PACKAGE = "vario")[[3]]
     ## now begin random swapping of blocks defined by strata 
     ntrials = 0 ; gtrials = 0
     rpsp.tmp1 = rpsp
@@ -883,9 +907,9 @@ randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
         rpsp.tmp1[-c(1,n2),-c(1,n2)][endrows,endcols] = rpsp.tmp2[startrows,startcols]
         rpsp.tmp1 = fixUnSampFalseBorder(psp,rpsp.tmp1)
         nstat = .C('spatstat',as.double(as.vector(rpsp.tmp1)),as.integer(n),
-                   as.double(rep(0,4)),PACKAGE = vario)[[3]]
+                   as.double(rep(0,4)),PACKAGE = "vario")[[3]]
         phiTemp = .C('calcphi',as.double(nstat),as.double(ostat),as.double(0),
-                     PACKAGE = vario)[[3]]
+                     PACKAGE = "vario")[[3]]
         if(phiTemp < phi){
             phi = phiTemp
             gtrials = gtrials +1
@@ -910,7 +934,7 @@ randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
                  alpha = as.double(alpha), pl = as.integer(pl-1),
                  nplaces = as.integer(length(pl)-1),ntrials = as.double(0),
                  gtrials = as.double(0), mtrials = as.double(mtrials2),
-                 PACKAGE = vario)
+                 PACKAGE = "vario")
         out = c(i,phi,gtrials,tmp$phi,tmp$gtrials,tmp$rpsp)
     }
     else
@@ -918,23 +942,25 @@ randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
     return(out)
 }
 
+#' Random Patterns spatial permutation algorithm
+#' 
+#' A convience function for working with randPat which calls the .C function
+#' 'randpatpar'. This function allows you to specify the number of processors to
+#' run on adding processsors only helps if working with many species as each
+#' species is evaulated on a different processor. Returns a (5+(n+2)^2) x S
+#' matrix, the first five rows of which are species index, phi strata stat,
+#' number of strata swaps, phi pixel swap, and number of pixel swaps, and then
+#' the remaining rows are the presences/abundances in the randomized occurances
+#' @param psp multidimenstional S x (n+2) x (n+2) array
+#' @param n the size of the orginal 2-D array along one spatial axis (i.e.,
+#'   without extra rows and columns)
+#' @param pl the places in rpsp that can be swaped
+#' @param mtrials the numbef of times to attempt a swap
+#' @param alpha the cutoff value for the phi statistic of Roxburgh and Chesson
+#'   1998
+#' @param npar the number of processors to run the code on
+#' @export
 randPatPar = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1){
-    ## Purpose: convience function for working with randPat which calls the .C
-    ## function 'randpatpar'. This function allows you to specify the number of
-    ## processors to run on adding processsors only helps if working with many
-    ## species as each species is evaulated on a different processor. Returns a 
-    ## (5+(n+2)^2) x S matrix, the first five rows of which are species index, phi
-    ## strata stat, number of strata swaps, phi pixel swap, and number of pixel
-    ## swaps, and then the remaining rows are the presences/abundances in the
-    ## randomized occurances
-    ## Arguments:
-    ## psp: multidimenstional S x (n+2) x (n+2) array
-    ## n: the size of the orginal 2-D array along one spatial axis (i.e., without
-    ##    extra rows and columns)
-    ## pl: the places in rpsp that can be swaped
-    ## mtrials: the numbef of times to attempt a swap
-    ## alpha: the cutoff value for the phi statistic of Roxburgh and Chesson 1998
-    ## npar: the number of processors to run the code on
     n = dim(psp)[2]
     if(length(dim(psp)) == 3)
         S = dim(psp)[1]
@@ -989,24 +1015,22 @@ randPatPar = function(psp,nstrata,mtrials1=1e3,mtrials2=1e6,alpha=0.01,npar=1){
     return(out)
 }
 
+#' Permute an array of occurances under a given set of constraints in 2-D space
+#' 
+#' @param psp the sp x row x col array, where rows and columns specify where on 
+#'   the spatial grid the sample was located
+#' @param shiftpos two numbers that are the x and y places to shift the grid, 
+#'   this is generated randomly if needed
+#' @param rotate a single number 1-4 that indicates how many counterclockwise 
+#'   rotations to perform, generated randomly
+#' @param meth the type of permutation to use, options include: 1) reflect:
+#'   random, 2) reflection/rotations of species (only makes sence when sp are
+#'   not fixed 3) shift: random torodial shifting with or with sp fixed 4) both:
+#'   both reflection and shifting 5) random: random shuffle
+#' @param sp if FALSE then obs composition of quadrats is fixed to the observed 
+#'   pattern if TRUE then species are each shuffled independently
+#' @export
 spatPerm2D = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE) {
-    ## Purpose: to permute an array of occurances under a given set of constraints
-    ## in 2-dimensions of space
-    ## Arguments:
-    ## psp: the sp x row x col array, where rows and columns specify where on
-    ##      the spatial grid the sample was located
-    ## shiftpos: two numbers that are the x and y places to shift the grid, this
-    ##           is generated randomly if needed
-    ## rotate: a single number 1-4 that indicates how many counterclockwise
-    ##         rotations to perform, generated randomly
-    ## meth: the type of permutation to use, options include:
-    ##   reflect: random reflection/rotations of species (only makes sence when
-    ##              sp are not fixed
-    ##   shift: random torodial shifting with or with sp fixed
-    ##   both: both reflection and shifting
-    ##   random: random shuffle
-    ## sp: if FALSE then obs composition of quadrats is fixed to the observed pattern
-    ##     if TRUE then species are each shuffled independently
     n = dim(psp)[2]
     if(length(dim(psp)) == 3){
         S = dim(psp)[1]
@@ -1167,28 +1191,26 @@ spatPerm2D = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',sp=FALSE) {
     return(Rpsp)
 }
 
+#' Permute an array of occurances under a given set of constraints in
+#' 2-dimensions of space with defined spatial strata, see 'nstrata'
+#' 
+#' @param psp the sp x row x col array, where rows and columns specify where on 
+#'   the spatial grid the sample was located
+#' @param shiftpos: two numbers that are the x and y places to shift the grid,
+#'   this is generated randomly if needed
+#' @param rotate: a single number 1-4 that indicates how many counterclockwise 
+#'   rotations to perform, generated randomly
+#' @param meth: the type of permutation to use, options include: 1) reflect:
+#'   random reflection/rotations of species (only makes sence when sp are not
+#'   fixed 2) shift: random torodial shifting with or with sp fixed 3) both:
+#'   both reflection and shifting 4) random: random shuffle
+#' @param sp: if FALSE then obs composition of quadrats is fixed to the observed
+#'   pattern if TRUE then species are each shuffled independently
+#' @param nstrata: is the number of strata along a single spatial axis within
+#'   which to randomize
+#' @export
 spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',
                           sp=FALSE,nstrata=1){
-    ## Purpose: to permute an array of occurances under a given set of constraints
-    ## in 2-dimensions of spacewith defined spatial strata, see 'nstrata'
-    ## argument below
-    ## Arguments:
-    ## psp: the sp x row x col array, where rows and columns specify where on
-    ##      the spatial grid the sample was located
-    ## shiftpos: two numbers that are the x and y places to shift the grid, this
-    ##           is generated randomly if needed
-    ## rotate: a single number 1-4 that indicates how many counterclockwise
-    ##         rotations to perform, generated randomly
-    ## meth: the type of permutation to use, options include:
-    ##   reflect: random reflection/rotations of species (only makes sence when
-    ##              sp are not fixed
-    ##   shift: random torodial shifting with or with sp fixed
-    ##   both: both reflection and shifting
-    ##   random: random shuffle
-    ## sp: if FALSE then obs composition of quadrats is fixed to the observed pattern
-    ##     if TRUE then species are each shuffled independently
-    ## nstrata: is the number of strata along a single spatial axis within which
-    ##          to randomize
     n = dim(psp)[2]
     if(length(dim(psp)) == 3){
         S = dim(psp)[1]
@@ -1218,13 +1240,17 @@ spatPermStrata = function(psp,shiftpos=NULL,rotate=NULL,meth='shift',
     if(flag)
         Rpsp = drop(Rpsp)
     return(Rpsp)
-    }
+}
 
+#' Shuffle a community site x species matrix
+#' @param comm site x species matrix with abundance or pres/absen data
+#' @param swap: two options: 'indiv' or 'quad' for individual or quadrat-based shuffling
+#' @export
+#' @examples
+#' x = matrix(1:100, 10, 10)
+#' shuffle_comm(x, 'quad')
+#' shuffle_comm(x, 'indiv')
 shuffle_comm = function(comm, swap) {
-    ## Purpose: to returned a shuffled community site x species matrix
-    ## Arguments:
-    ## comm: site x species matrix with abundance or pres/absen data
-    ## swap: two options: 'indiv' or 'quad' for individual or quadrat-based shuffling
     if (swap == 'indiv') {
         nquad = nrow(comm)
         comm_shuffled = comm
@@ -1240,25 +1266,29 @@ shuffle_comm = function(comm, swap) {
     return(comm_shuffled)
 }
 
+#' Generate individual or sample-based random shuffle statistical null 
+#' expectations for variograms.
+#' 
+#' @param x is either an output of class 'sim' that is the output of
+#'   'sim.neut.uni' OR an site x species matrix
+#' @param vobject is the output of 'vario', this informs the function of what
+#'   parameterization of vario to use specifically it indiates if the pos.neg
+#'   components and median should be calculated
+#' @param swap two options: 'indiv' or 'quad' for individual or quadrat-based
+#'   shuffling repsectively.
+#' @param nperm is the number of permutations
+#' @param npar is the number of processors to run the analysis over
+#' @param coords the spatial coordinates of the sites, not needed if x is of
+#'   class 'sim'
+#' @param breaks what spatial breaks to use
+#' @note The sample-based shuffling the mean of the null distribution is the
+#'   same as the average variance across all distance classes. So shuffling is
+#'   only useful in deriving the variance around that expectation.
+#' @note if x is a presence-absence matrix then the individual and sample-based 
+#'   approaches will generate identical within-species variograms
+#' @note this function requires snowfall and rlecuyer packages are loaded
+#' @export
 random_shuffle = function(x, vobject, swap, nperm, npar, coords=NULL, breaks=NA) {
-    ## Purpose: to generate individual or sample-based random shuffle statistical
-    ## null expectations for variograms. 
-    ## Note: With the sample-based shuffling the mean of the null distribution is
-    ## the same as the average variance across all distance classes. So shuffling
-    ## is only useful in deriving the variance around that expectation.
-    ## Note: if x is a presence-absence matrix then the individual and sample-based
-    ## approaches will generate identical within-species variograms
-    ##Arguments:
-    ##"x" is either an output of class 'sim' that is the output of 'sim.neut.uni' OR an site x species matrix
-    ##"vobject" is the output of 'vario', this informs the function of what parameterization of vario to use
-    ###specifically it indiates if the pos.neg components and median should be calculated
-    ##"swap" two options: 'indiv' or 'quad' for individual or quadrat-based shuffling
-    ### repsectively. 
-    ##"nperm" is the number of permutations
-    ##"npar" is the number of processors to run the analysis over
-    ##"coords" the spatial coordinates of the sites, not needed if x is of class 'sim'
-    ##"breaks" what spatial breaks to use
-    ## NOTE: this function requires snowfall and rlecuyer packages are loaded
     dists = vobject$vario$Dist
     grain = vobject$parms$grain
     hmin = vobject$parms$hmin
@@ -1332,15 +1362,26 @@ random_shuffle = function(x, vobject, swap, nperm, npar, coords=NULL, breaks=NA)
 
 
 ## Plotting Functions-----------------------------------------------------------
+#' Plot community variograms, the results of function 'vario'
+#' 
+#' @param vobject the output of the function 'vario' or the function 'nullPerm'
+#' @param optim is the location of the species niches
+#' @param exp.only if TRUE then only the two expected (spatial and nonspatial) 
+#'   components of variance displayed
+#' @param flip.neg if TRUE then negative fraction is expressed as a positive
+#'   value
+#' @param ylim the limits on the y-axis
+#' @param xlab the label for the x-axis
+#' @param ylab the label of the y-axis
+#' @param cls the colors for the curves
+#' @export
+#' @examples
+#' x = matrix(runif(100), 10, 10)
+#' coord = cbind(1:10, 1)
+#' v = vario(x, coord)
+#' vGraph(v)
 vGraph = function(vobject,optim=NA,exp.only=FALSE,flip.neg=FALSE,ylim=NULL,
                   xlab=NULL,ylab=NULL,cls=NULL) {
-    ## Purpose: to graph community variograms, the results of function 'vario'
-    ## Arguments
-    ## vobject: the output of the function 'vario' or the function 'nullPerm'
-    ## optim: is the location of the species niches
-    ## exp.only: if TRUE then only the two expected (spatial and nonspatial)
-    ##           components of variance displayed
-    ## flip.neg: if TRUE then negative fraction is expressed as a positive value
     n = sqrt(vobject$parms$N)
     N = n^2
     S = vobject$parms$S
@@ -1411,13 +1452,21 @@ vGraph = function(vobject,optim=NA,exp.only=FALSE,flip.neg=FALSE,ylim=NULL,
     }
 }
 
+#' Plot community variograms, when permutations have been carried out
+#'
+#' @param vrand output of nullPerm
+#' @param vspat output of vario (?)
+#' @param obs.var boolean, if TRUE the obs var is plotted
+#' @param ylims
+#' @param xlims
+#' @param ylab
+#' @param xlab 
+#' @param cls
+#' @param lwd
+#' @param plot.new
+#' @export
 vGraphPerm = function(vrand=NULL,vspat=NULL,obs.var=FALSE,ylims=NA,xlims=NA,
                       ylab='variance',xlab='lag',cls=NA,lwd=1,plot.new=TRUE) {
-    ## Purpose: to graph community variograms, the results of function 'vario'
-    ## when all permutations have been run
-    ## Arguments
-    ## 'vobject' the output of the function 'vario' or the function 'nullPerm'
-    ## 'draw' may be 'exp','total', 'both' or 'pos-neg'
     rflag = !is.null(vrand)
     sflag = !is.null(vspat)
     if( rflag ){
