@@ -1,7 +1,7 @@
 Package: vario
-Title: vario: community variograms and associated null models
+Title: Community variograms and associated null models
 Description: This package computes the spatial community variograms first
-developed in Wagner, Ecology, 2003. Additionally code is provided to carry out
+developed in Wagner Ecology 2003. Additionally code is provided to carry out
 null model analysis to examine if the spatial patterns differ from chance
 expectation. Lastly this package provides graphical helper functions for
 examining the results.
