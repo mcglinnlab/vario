@@ -48,6 +48,7 @@ library.dynam("vario", package="vario", lib.loc=.libPaths()[1])
 #'   then soreson index is computed by 'bray'.
 #' @param min minimum value
 #' @param max maximum value
+#' @useDynLib vario, .registration = TRUE
 #' @export
 #' @examples
 #' x = matrix(runif(100), ncol=10, nrow=10)
@@ -348,6 +349,7 @@ check_vario_direction_args = function(direction = 'omnidirectional',
 #'   matrices, each in vector format
 #' @param x is a sitexsp matrix (sp as columns) of real numbers rows are the 
 #'   sites, columns are the species
+#' @useDynLib vario, .registration = TRUE
 #' @export
 #' @examples
 #' x = matrix(runif(100), 10, 10)
@@ -886,6 +888,7 @@ nullPerm = function(x, vobject, nperm, coords=NULL, meth='both',
 #' @param mtrials2 the number of times to attempt a swap at the pixel level
 #' @param alpha the cutoff value for the phi statistic of Roxburgh and Chesson
 #'   1998
+#' @useDynLib vario, .registration = TRUE
 #' @export
 randPat = function(i,psp,rpsp,n,nstrata,pl,mtrials1=1e3,mtrials2=1e6,
                    alpha=0.01){
