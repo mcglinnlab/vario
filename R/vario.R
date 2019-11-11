@@ -1,3 +1,5 @@
+library.dynam("vario", package="vario", lib.loc=.libPaths()[1])
+
 ## Spatial analysis functions---------------------------------------------------
 #' Calculate uni- and multi-variate variograms
 #'
@@ -51,6 +53,13 @@
 #' x = matrix(runif(100), ncol=10, nrow=10)
 #' coord = cbind(1:10, 1)
 #' vario(x, coord)
+#' \dontrun{
+#' library(vegan)
+#' data(mite)
+#' data(mite.xy)
+#' vario(as.matrix(mite), mite.xy)
+#' vario(as.matrix(mite), mite.xy, pos.neg=T)
+#' }
 vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
                  hmax=NA, round.int=FALSE, pos.neg=FALSE, binary=TRUE,
                  snap=NA, median=FALSE, quants=NA, direction = 'omnidirectional',
@@ -133,11 +142,24 @@ vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
             ## coords changed to coord
             u.ang = .C("tgangle", as.double(as.vector(coord[ , 1])),
                        as.double(as.vector(coord[ , 2])), as.integer(dim(coord)[1]),
-                       res = as.double(rep(0, length(as.vector(Dist)))))$res
+                       res = as.double(rep(0, length(as.vector(Dist)))), PACKAGE = 'vario')$res
             if (any(is.na(u.ang)))
                 stop("NA returned in angle calculations maybe due to co-located data")
             u.ang = atan(u.ang)
             u.ang[u.ang < 0] = u.ang[u.ang < 0] + pi
+            
+            if (unit.angle == "degrees") {
+                ang.deg = direction
+                ang.rad = (ang.deg * pi) / 180
+                tol.deg = tolerance
+                tol.rad = (tol.deg * pi) / 180
+            }
+            else {
+                ang.rad = direction
+                ang.deg = (ang.rad * 180) / pi
+                tol.rad = tolerance
+                tol.deg = (tol.rad * 180) / pi
+            }
             ang.lower = ang.rad - tol.rad
             ang.upper = ang.rad + tol.rad
             if (ang.lower >= 0 & ang.upper < pi)
@@ -336,7 +358,7 @@ getCovFractions = function(x) {
     x = as.double(ifelse(is.na(x) | x == -999,-99999,x))
     pos = as.double(rep(0,(N*(N-1))/2))
     neg = as.double(rep(0,(N*(N-1))/2))
-    result = .C('loopcovreal',x,N,S,pos,neg,PACKAGE = 'vario')
+    result = .C('loopcovreal',x,N,S,pos,neg, PACKAGE = 'vario')
     out = list()
     out$pos = result[[4]]
     out$neg = result[[5]]
