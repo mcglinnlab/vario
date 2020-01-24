@@ -4,12 +4,26 @@
 \alias{vario}
 \title{Calculate uni- and multi-variate variograms}
 \usage{
-vario(x, coord, grain = 1, breaks = NA, log = FALSE, hmin = NA,
-  hmax = NA, round.int = FALSE, pos.neg = FALSE, binary = TRUE,
-  snap = NA, median = FALSE, quants = NA,
-  direction = "omnidirectional", tolerance = pi/8,
-  unit.angle = c("radians", "degrees"), distance.metric = "euclidean",
-  univariate = FALSE)
+vario(
+  x,
+  coord,
+  grain = 1,
+  breaks = NA,
+  log = FALSE,
+  hmin = NA,
+  hmax = NA,
+  round.int = FALSE,
+  pos.neg = FALSE,
+  binary = TRUE,
+  snap = NA,
+  median = FALSE,
+  quants = NA,
+  direction = "omnidirectional",
+  tolerance = pi/8,
+  unit.angle = c("radians", "degrees"),
+  distance.metric = "euclidean",
+  univariate = FALSE
+)
 }
 \arguments{
 \item{x}{an object of class 'sim' or may be a sitexsp matrix, a vector of

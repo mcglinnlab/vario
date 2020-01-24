@@ -4,8 +4,17 @@
 \alias{randPat}
 \title{Random Patterns spatial permutation algorithm}
 \usage{
-randPat(i, psp, rpsp, n, nstrata, pl, mtrials1 = 1000,
-  mtrials2 = 1e+06, alpha = 0.01)
+randPat(
+  i,
+  psp,
+  rpsp,
+  n,
+  nstrata,
+  pl,
+  mtrials1 = 1000,
+  mtrials2 = 1e+06,
+  alpha = 0.01
+)
 }
 \arguments{
 \item{i}{the ith species index}

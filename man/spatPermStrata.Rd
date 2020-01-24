@@ -5,8 +5,14 @@
 \title{Permute an array of occurances under a given set of constraints in
 2-dimensions of space with defined spatial strata, see 'nstrata'}
 \usage{
-spatPermStrata(psp, shiftpos = NULL, rotate = NULL, meth = "shift",
-  sp = FALSE, nstrata = 1)
+spatPermStrata(
+  psp,
+  shiftpos = NULL,
+  rotate = NULL,
+  meth = "shift",
+  sp = FALSE,
+  nstrata = 1
+)
 }
 \arguments{
 \item{psp}{the sp x row x col array, where rows and columns specify where on 

@@ -4,8 +4,16 @@
 \alias{nullGen}
 \title{Mediate the generation of statistical null values for the variograms}
 \usage{
-nullGen(pop, vobject, coords, meth, sp, all = FALSE, RPargs = FALSE,
-  median = FALSE)
+nullGen(
+  pop,
+  vobject,
+  coords,
+  meth,
+  sp,
+  all = FALSE,
+  RPargs = FALSE,
+  median = FALSE
+)
 }
 \arguments{
 \item{pop}{the species x row x col array where row and column refer to 

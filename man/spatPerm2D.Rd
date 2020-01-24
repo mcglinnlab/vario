@@ -4,8 +4,7 @@
 \alias{spatPerm2D}
 \title{Permute an array of occurances under a given set of constraints in 2-D space}
 \usage{
-spatPerm2D(psp, shiftpos = NULL, rotate = NULL, meth = "shift",
-  sp = FALSE)
+spatPerm2D(psp, shiftpos = NULL, rotate = NULL, meth = "shift", sp = FALSE)
 }
 \arguments{
 \item{psp}{the sp x row x col array, where rows and columns specify where on 

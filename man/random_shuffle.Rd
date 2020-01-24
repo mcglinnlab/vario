@@ -5,8 +5,7 @@
 \title{Generate individual or sample-based random shuffle statistical null 
 expectations for variograms.}
 \usage{
-random_shuffle(x, vobject, swap, nperm, npar, coords = NULL,
-  breaks = NA)
+random_shuffle(x, vobject, swap, nperm, npar, coords = NULL, breaks = NA)
 }
 \arguments{
 \item{x}{is either an output of class 'sim' that is the output of

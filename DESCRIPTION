@@ -13,4 +13,4 @@ License: MIT
 URL: https://github.com/dmcglinn/vario
 LazyLoad: true
 Collate: vario.R
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

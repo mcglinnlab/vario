@@ -7,8 +7,11 @@ are supplied to the function vario(), if these checks are failed then vario()
 will stop with an error message
 Note: this code was copied from the package geoR in the function variog}
 \usage{
-check_vario_direction_args(direction = "omnidirectional",
-  tolerance = pi/8, unit.angle = c("radians", "degrees"))
+check_vario_direction_args(
+  direction = "omnidirectional",
+  tolerance = pi/8,
+  unit.angle = c("radians", "degrees")
+)
 }
 \description{
 Internal function that carries out checks on the directional arguments that

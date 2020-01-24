@@ -4,9 +4,18 @@
 \alias{vGraphPerm}
 \title{Plot community variograms, when permutations have been carried out}
 \usage{
-vGraphPerm(vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
-  xlims = NA, ylab = "variance", xlab = "lag", cls = NA, lwd = 1,
-  plot.new = TRUE)
+vGraphPerm(
+  vrand = NULL,
+  vspat = NULL,
+  obs.var = FALSE,
+  ylims = NA,
+  xlims = NA,
+  ylab = "variance",
+  xlab = "lag",
+  cls = NA,
+  lwd = 1,
+  plot.new = TRUE
+)
 }
 \arguments{
 \item{vrand}{output of nullPerm}
@@ -15,7 +24,17 @@ vGraphPerm(vrand = NULL, vspat = NULL, obs.var = FALSE, ylims = NA,
 
 \item{obs.var}{boolean, if TRUE the obs var is plotted}
 
-\item{xlab}{}
+\item{ylims}{ylims}
+
+\item{xlims}{xlims}
+
+\item{ylab}{ylab}
+
+\item{xlab}{xlab}
+
+\item{cls}{cls}
+
+\item{lwd}{lwd}
 }
 \description{
 Plot community variograms, when permutations have been carried out

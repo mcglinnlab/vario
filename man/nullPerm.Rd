@@ -4,9 +4,20 @@
 \alias{nullPerm}
 \title{Generate statistical null expectations for the variograms}
 \usage{
-nullPerm(x, vobject, nperm, coords = NULL, meth = "both", sp = TRUE,
-  all = FALSE, snap = NULL, npar = 1, linux = FALSE,
-  RPargs = FALSE, breaks = NA)
+nullPerm(
+  x,
+  vobject,
+  nperm,
+  coords = NULL,
+  meth = "both",
+  sp = TRUE,
+  all = FALSE,
+  snap = NULL,
+  npar = 1,
+  linux = FALSE,
+  RPargs = FALSE,
+  breaks = NA
+)
 }
 \arguments{
 \item{x}{is either an output of class 'sim' that is the output of 

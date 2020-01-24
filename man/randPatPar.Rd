@@ -4,8 +4,14 @@
 \alias{randPatPar}
 \title{Random Patterns spatial permutation algorithm}
 \usage{
-randPatPar(psp, nstrata, mtrials1 = 1000, mtrials2 = 1e+06,
-  alpha = 0.01, npar = 1)
+randPatPar(
+  psp,
+  nstrata,
+  mtrials1 = 1000,
+  mtrials2 = 1e+06,
+  alpha = 0.01,
+  npar = 1
+)
 }
 \arguments{
 \item{psp}{multidimenstional S x (n+2) x (n+2) array}

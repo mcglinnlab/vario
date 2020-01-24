@@ -4,8 +4,16 @@
 \alias{vGraph}
 \title{Plot community variograms, the results of function 'vario'}
 \usage{
-vGraph(vobject, optim = NA, exp.only = FALSE, flip.neg = FALSE,
-  ylim = NULL, xlab = NULL, ylab = NULL, cls = NULL)
+vGraph(
+  vobject,
+  optim = NA,
+  exp.only = FALSE,
+  flip.neg = FALSE,
+  ylim = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  cls = NULL
+)
 }
 \arguments{
 \item{vobject}{the output of the function 'vario' or the function 'nullPerm'}

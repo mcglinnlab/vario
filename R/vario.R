@@ -1,4 +1,4 @@
-library.dynam("vario", package="vario", lib.loc=.libPaths()[1])
+#library.dynam("vario", package="vario", lib.loc=.libPaths()[1])
 
 ## Spatial analysis functions---------------------------------------------------
 #' Calculate uni- and multi-variate variograms
@@ -745,7 +745,7 @@ nullPerm = function(x, vobject, nperm, coords=NULL, meth='both',
                 rpop = rpop[ , -c(1, n2), -c(1, n2)]
             }
             else {
-                rpop = SpatPerm2D(pop, meth=meth, sp=sp)
+                rpop = spatPerm2D(pop, meth=meth, sp=sp)
                 rpop = FixUnSamp2(pop, rpop)
             }
             rmat = apply(rpop, 1, as.vector) ##converts to a M^2 x S matrix - same effect as loop in 'census' function 
@@ -1482,13 +1482,12 @@ vGraph = function(vobject,optim=NA,exp.only=FALSE,flip.neg=FALSE,ylim=NULL,
 #' @param vrand output of nullPerm
 #' @param vspat output of vario (?)
 #' @param obs.var boolean, if TRUE the obs var is plotted
-#' @param ylims
-#' @param xlims
-#' @param ylab
-#' @param xlab 
-#' @param cls
-#' @param lwd
-#' @param plot.new
+#' @param ylims ylims
+#' @param xlims xlims
+#' @param ylab ylab
+#' @param xlab xlab
+#' @param cls cls
+#' @param lwd lwd
 #' @export
 vGraphPerm = function(vrand=NULL,vspat=NULL,obs.var=FALSE,ylims=NA,xlims=NA,
                       ylab='variance',xlab='lag',cls=NA,lwd=1,plot.new=TRUE) {
