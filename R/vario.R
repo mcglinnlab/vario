@@ -66,7 +66,7 @@ vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
                  snap=NA, median=FALSE, quants=NA, direction = 'omnidirectional',
                  tolerance = pi/8, unit.angle = c('radians', 'degrees'),
                  distance.metric = 'euclidean', univariate=FALSE){
-    if (class(x) == "sim"){
+    if (class(x)[1] == "sim"){
         coord = x$coords
         if (is.na(snap))
             snap = length(sim$snaps)
@@ -129,7 +129,7 @@ vario = function(x, coord, grain=1, breaks=NA, log=FALSE, hmin=NA,
                                    tolerance, unit.angle, distance.metric, 
                                    quants = ifelse(is.na(quants[1]), NA, 
                                                    paste(quants* 100, collapse=", ")))
-        if(class(x) == "sim"){
+        if(class(x)[1] == "sim"){
             if(binary)
                 x = apply(census(x, snap=snap), c(1, 2), as.logical) * 1
             else
